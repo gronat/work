@@ -17,7 +17,7 @@
 %\documentstyle[nips14submit_09,times,art10]{article} % For LaTeX 2.09
 
 
-\title{Embedding Fisher Vectors for Place Recognition}
+\title{Fisher vector places: Learning compact place specific descriptors}
 
 
 \author{
@@ -96,26 +96,26 @@ Address \\
 	The aim of this work is to localize a query photograph by finding other images depicting the same place in a large geotagged image database. The contribution of this paper is as follows. We represent each database image by a Fisher vector and for each vector we learn per-location SVM classifiers. We show that trained and re-normalized SVM weight can be used as an embedded descriptor that replaces original Fisher vector. Though the SVMs were learned independently no further calibration is necessary. We perform two experiments on state-of-the-art datasets for place recognition and we show that our method consistently improves the results for different dimensions of decorrelated Fischer vectors.
 \end{abstract}
 
-\section{Motivation}
+\section{Introduction}
 	Internet contains a huge collection of imagery that grows  literally every second. For instance, in 2013 Facebook claimed \cite{imageGrow} that every single minute users upload about 208,300 new images, for Instagrama this number was about  27,800. This makes about 340,000,000 new images per day. Another interesting factor is that every minute users will upload more than 100 hours of video on Youtube. Considering the fact that most of the videos are in HD make these numbers even more impressive.
 
 	Imagine that there was a system that takes a picture from the imagery as an input and it shows you a position on the map indicating where the input image was captured. What would be this system useful for? One could take a picture from his smartphone and use it as an alternative to GPS or to precise localization in urban areas when the GPS was noisy. Surely, it would find its place in security and surveillance applications where one could localize an unknown image or video sequence based on its appearance. An alternative application would be a path reconstruction from a first-person-view or UAV video \c which was cheaper then state-of-the-art SLAM. Interesting may be a localization of scenes in old movies or collecting images from one place and observe how the place has changed over time.
 
 	Indeed, many of these systems already exist \cite{Majdik2013, Torii2011} and have been intensively developed in last decade. In place recognition problems, researchers use many diverse techniques and aim for slightly different goals but the basic idea of the place recognition is the same; There is a structured collection of imagery where each image contains information about its location in the environment. This information can be for instance a GPS location or an image position in the semantic graph. Such a structured image collection is called a database. Given an unknown query image, the goal is to find the most similar image in the database and use its structural information for query localization, e.g. plot its GPS position on the map.
 
-	The structured database may contain from few thousands to couple of millions of images.  To find a similar image in the database is therefore a challenging task. As an example, the query and database images may depict the same 3D object (e.g. building) from a different camera viewpoint, under different illumination conditions or the object can be partially occluded. In addition, the database can be very large. For instance, we estimate that Google Street View of France contains more than 60 million panoramic images. Therefore, we want to represent the images by descriptors that are robust to viewpoint changes, occlusion, illumination conditions and at the same time these descriptors must be low dimensional (or very sparse) in order to perform efficient and chap retrieval in a large database.
+	The structured database may contain from few thousands to couple of millions of images.  To find a similar image in the database is therefore a challenging task. As an example, the query and database images may depict the same 3D object (e.g. building) from a different camera viewpoint, under different illumination conditions or the object can be partially occluded. In addition, the database can be very large. For instance, we estimate that Google Street View of France contains more than 60 million panoramic images. Therefore, we want to represent the images by descriptors that are robust to viewpoint changes, occlusion, illumination conditions and at the same time these descriptors must be low dimensional (or very sparse) in order to perform efficient and cheap retrieval in a large database.
 
 
 \section{Related work} 
 \label{sec:overview}
 	Unlike the other work in large scale place recognition~\cite{Gronat2013,Cummins09,Knopp2010,Schindler07} and image retrieval~\cite{Nister06,Philbin07,Sivic2003}, we do not build on the bag-of-visual-words representation~\cite{Csurka04,Sivic2003}. Instead, we use Fisher vectors (FV) \cite{Jegou2011} that are recently finding its place in image retrieval, place recognition \cite{Torii2013} and other computer vision tasks \cite{Simonyan2013, Krapac2011}. These high-dimensional image representations are well-suited for retrieval problems since they are very robust to view-point changes and are more discriminative than standard bag-of-visual-words (BOW). However, the main drawback of FV is that unlike BOW it is dense which makes it nearly unfeasible for usage because of the memory footprint and computational cost.
 
- 	For the above-mentioned reasons researchers aim on FV optimization. As an example, a nice paper of Perronnin et al. \cite{Perronnin2010} focuses on analysis and compression of FV for image retrieval. They explain how the FV is related to BOW and underline that power-normalization of FV is equivalent to a burstiness features suppression \cite{Jegou2009}. They benefit from the fact that as the power~$\alpha$ goes to zero the {$\alpha$-normalized} Fisher vector converges to a ternary representation which can be efficiently binarized. They compared their method with the Local Sensitive Hashing and the Spectral Hashing and showed comparable results while achieving only 520~bits signature per image. This encouraging result have been outperformed by Jegou et al. \cite{Jegou2011} who achieved comparable results with just 128~bits signature by using dot product quantizers. Hence, the Fisher vectors can be significantly compressed by appropriate indexing. In general, these results have been achieved by optimizing:
+ 	For the above-mentioned reasons researchers aim on FV optimization. As an example, a nice paper of Perronnin et al. \cite{Perronnin2010} focuses on analysis and compression of FV for image retrieval. They explain how the FV is related to BOW and underline that power-normalization of FV is equivalent to a burstiness features suppression \cite{Jegou2009}. They benefit from the fact that as the power~$\alpha$ goes to zero the {$\alpha$-normalized} Fisher vector converges to a ternary representation which can be efficiently binarized. They compared their method with the Local Sensitive Hashing (LSH) and the Spectral Hashing (SH) and showed comparable results while achieving only 520~bits signature per image. This encouraging result have been outperformed by Jegou et al. \cite{Jegou2011} who achieved comparable results with just 128~bits signature by using product quantizers (PQ). Hence, the Fisher vectors can be significantly compressed by appropriate indexing. In general, these results have been achieved by optimizing:
  	
  	\begin{enumerate}[(i)]
  		\item the aggregation of local image descriptors (FV)
  		\item the dimensionality reduction (e.g. PCA, Mahalanobis metric, whitening)
- 		\item the indexing algorithm (eg. dot-product quantizers, LSH, SH)
+ 		\item the indexing algorithm (eg. PQ, LSH, SH)
  	\end{enumerate}
 
  	The lower the dimension before indexing step (iii) is the lower size of the signature is achieved after indexation. Therefore it is very important to project the FV into lower dimension. There are different methods for (ii) among which the very popular is PCA. This method, however, has a drawback. It discards uncorrelated `noisy' dimensions that can actually contain discriminative information for image retrieval.This problem have been addressed in \cite{Simonyan2013}. They use a labeled training data and utilize discriminative learning in order to learn a global low-rank metric which can be decomposed to a linear projection to low-dimensional space. Our method aim on improving the performance of the projected FV, hence it could be viewed as an intermediate step between (ii) and (iii) into the scheme above.
@@ -161,7 +161,7 @@ Address \\
 		While some works, e.g.\cite{Perronnin2010}, use only a partial derivatives w.r.t. the mean parameters (equation~\eqref{eq:FVmean}), we use partial derivatives both w.r.t. the mean and variance because this approach have been implemented in a library that we used (details are provided in section \ref{sec:exp}). As reported in \cite{Jegou2010} both approaches provide comparable results.
 
 		\subsection{Normalization}
-			As in the case of standard BOW, the $L2$ normalization is a natural way to measure similarity between two FVs by a dot-product. However it has been shown that direct $L2$ normalization is suboptimal and better performance can be achieved by power-normalization followed by $L2$ normalization. Thus the normalization operator can be written as follows:
+			As in the case of standard BOW, Fisher vector is typically $L2$ normalized in order to measure similarity between two FVs by a dot-product. However it has been shown that direct $L2$ normalization is suboptimal and better performance can be achieved by power-normalization followed by $L2$ normalization. Thus the normalization operator can be written as follows:
 			
 			\begin{equation}
 				L(z)=\dfrac{\text{sign} (z) \abs{z}^\alpha}{\norm{\text{sign}(z) \abs{z}^\alpha}}
@@ -169,12 +169,12 @@ Address \\
 			\end{equation}
 
 			\noindent
-			where power $\alpha \in (0,1)$. As mentioned in the introduction, the power-normalization has the effect of suppression of the descriptors that occur frequently in the image (bursty features), these can be for instance periodical structures such as skyscraper windows or bricks of the wall. In our setup we use $\alpha=0.5$ as it has been reported by Jegou et al. \cite{Jegou2012HAL} that this value is optimal for wide range of GMM components $N$.
+			where $\alpha \in (0,1)$ is an element-wise power and $z \in R^n$ is arbitrary real vector. As mentioned in the introduction, the power-normalization has the effect of suppression of the descriptors that occur frequently in the image (bursty features), these can be for instance periodical structures such as skyscraper windows or bricks of the wall. In our setup we use $\alpha=0.5$ as it has been reported by Jegou et al. \cite{Jegou2012HAL} that this value is optimal for wide range of GMM components $N$.
 
 		\subsection{Dimension reduction}
-			The resulted Fisher vector is a high-dimensional representation of an image, which dimensionality depends only on number of $N$ components of the GMM and dimension $d$ of the local image descriptors which is fixed. In practice, the PCA is being used for decorrelation and projection to a lower dimensional space because it subsequently directly affects a size of the indexed signature (see Sec. \ref{sec:overview} and \ref{Jegou2011}).
+			The resulted Fisher vector is a high-dimensional representation of an image, which dimensionality depends only on number of $N$ components of the GMM and dimension $d$ of the local image descriptors which is fixed. In practice, the PCA is being used for decorrelation and projection to a lower dimensional space because it subsequently directly affects a size of the indexed signature (see Sec. \ref{sec:overview} and \cite{Jegou2011}).
 
-			We observed that after the PCA decorrelation it is important to $L2$ re-normalize projected FV to achieve better performance. Our interpretation is that after performing the PCA the higher dimensions contain a noise that affects only a magnitude of the projected vectors but not its direction \textcolor{myRed}{Figure or not?}. Furthermore we observed that even slightly better results can be achieved by using the normalization operator \eqref{eq:Loperator} instead of $L2$. This is just an empirical result and we do not have any explanation for it.
+			We observed that after the PCA decorrelation it is important to $L2$ re-normalize projected FV to achieve better performance. Our interpretation is that after performing the PCA the higher dimensions contain a noise that affects only a magnitude of the projected vectors but not its direction \textcolor{myRed}{Figure or not?}. Furthermore we observed that even slightly better results can be achieved by using the normalization operator \eqref{eq:Loperator} instead of $L2$.
 
 			Finally, it is worth noting that PCA projection into a `not-too-low' dimensional space can actually slightly improve the performance of the full FV. What that `not-too-low' actually means have been partially discussed in \cite{Jegou2012HAL}. However, in general as the dimension decreases the performance of decorrelated FV decrease which is, indeed, what we observe in our experiments. In the next section we therefore aim on enhancing the performance of projected FVs.   
 
@@ -215,21 +215,21 @@ Address \\
 
       	The positive training data set $\mathcal P_j$ is represented by the only image $j$ itself. Why is that? It comes from the nature of the dataset. One could find additional positive examples by taking adjacent panorama images and building a graph where each node represents an image and each edge represents a visual overlap. However, due to the panorama sampling density during the capturing process of the Google Street View it is very rare to detect a visual overlap between two adjacent panoramas. Instead, very often the detected visual overlap is between the images that come from the same panorama and differ by a homography. We found that there is no benefit from taking these images into account.
 
-    \subsection{Limit case behavior}
-      	The convex objective \eqref{eq:obj} consist of regularization term a two penalty terms with weights $C_1$ and $C_2$. Lets assume for the moment that the weight of the negative data penalty $C_2 \rightarrow 0$. Then the regularization term and the first penalty term dominates the equation \eqref{eq:obj}. Since $\mathcal P_j$ contain only a single positive training data, the sum from eq. \eqref{eq:obj} becomes
+\section{Why does exemplar-svm works}
+  	The convex objective \eqref{eq:obj} consist of regularization term a two penalty terms with weights $C_1$ and $C_2$. Lets assume for the moment that the weight of the negative data penalty $C_2 \rightarrow 0$. Then the regularization term and the first penalty term dominates the equation \eqref{eq:obj}. Since $\mathcal P_j$ contain only a single positive training data, the sum from eq. \eqref{eq:obj} becomes
 
-      	\begin{equation}
-      		C_1\sum_{\Phi\in \mathcal P_j}h(w_j^T\Phi+b_j)=C_1 \cdot h(w_j^T\Phi^++b_j)
-      		\label{eq:penalty}
-      	\end{equation}
+  	\begin{equation}
+  		C_1\sum_{\Phi\in \mathcal P_j}h(w_j^T\Phi+b_j)=C_1 \cdot h(w_j^T\Phi^++b_j)
+  		\label{eq:penalty}
+  	\end{equation}
 
-      	where $\Phi^+$ denotes a single FV. Any weight $w_j$ can be decomposed into parallel and orthogonal direction w.r.t. $\Phi^+$ such that $w_j=w_j^{\perp}+w_j^{||}$. If the orthogonal part was removed it would not affect the value of the penalty \eqref{eq:penalty} since $(w_j^{\perp}+w_j^{||})^T\Phi^+=w_j^{|| T} \Phi^+$ but the regularization term would decrease. \textcolor{myRed}{Can we do this in dual?}
+  	where $\Phi^+$ denotes a single FV. Any weight $w_j$ can be decomposed into parallel and orthogonal direction w.r.t. $\Phi^+$ such that $w_j=w_j^{\perp}+w_j^{||}$. If the orthogonal part was removed it would not affect the value of the penalty \eqref{eq:penalty} since $(w_j^{\perp}+w_j^{||})^T\Phi^+=w_j^{|| T} \Phi^+$ but the regularization term would decrease. \textcolor{myRed}{Can we do this in dual?}
 
-      	This means that as we decrease the penalty weight $C_2$ the optimal $w_j^*$ is close to being parallel with the original Fisher vector $\Phi^+$ and its norm goes to zero. The re-normalized $w_j^*$ is therefore almost identical with $\Phi^+$. As we increase the weight $C_2$ the optimal $w_j^*$ declines from the original FV and this declination depends on (i) distribution of the negative data and (ii) the value of $C_2$. Loosely speaking, the parameter $C_2$ designates how much information amount hard negative examples wil be embedded int $w_j^*$
+  	This means that as we decrease the penalty weight $C_2$ the optimal $w_j^*$ is close to being parallel with the original Fisher vector $\Phi^+$ and its norm goes to zero. The re-normalized $w_j^*$ is therefore almost identical with $\Phi^+$. As we increase the weight $C_2$ the optimal $w_j^*$ declines from the original FV and this declination depends on (i) distribution of the negative data and (ii) the value of $C_2$. Loosely speaking, the parameter $C_2$ designates how much information amount hard negative examples wil be embedded int $w_j^*$
 
-      	As a conclusion, for certain setting of the parameters $C_1$ and $C_2$ the learned $w_j^*$ is slightly declined from the original Fisher vector in such a way that it is better separated from the hard negative examples. The details of picking the parameters are given in the following section.
+  	As a conclusion, for certain setting of the parameters $C_1$ and $C_2$ the learned $w_j^*$ is slightly declined from the original Fisher vector in such a way that it is better separated from the hard negative examples. The details of picking the parameters are given in the following section.
 
-      	\textcolor{myRed}{(TODO: In Results show (i) how much it differs e.g. dot product with original FV, (ii) how the performance changes with C2 e.g. x-validation plot or just plot.)}
+  	\textcolor{myRed}{(TODO: In Results show (i) how much it differs e.g. dot product with original FV, (ii) how the performance changes with C2 e.g. x-validation plot or just plot.)}
 
 \section{Experimental evaluation}
 \label{sec:exp}
