@@ -1,0 +1,341 @@
+\documentclass[table]{article} % For LaTeX2e
+
+\usepackage{hyperref}
+\usepackage{url}
+\usepackage{epsfig}
+\usepackage{epstopdf}
+\usepackage{enumerate}
+\usepackage{amsmath}
+\usepackage{graphicx}
+\usepackage{subfigure}
+\usepackage{caption}
+\usepackage{tabularx}
+\usepackage[table]{xcolor}
+\usepackage{nips14submit_e,times}% This must be used after \usepackage[table]{xcolor} otherwise doesnt work
+
+
+%\documentstyle[nips14submit_09,times,art10]{article} % For LaTeX 2.09
+
+
+\title{Embedding Fisher Vectors for Place Recognition}
+
+
+\author{
+David S.~Hippocampus\thanks{ Use footnote for providing further information
+about author (webpage, alternative address)---\emph{not} for acknowledging
+funding agencies.} \\
+Department of Computer Science\\
+Cranberry-Lemon University\\
+Pittsburgh, PA 15213 \\
+\texttt{hippo@cs.cranberry-lemon.edu} \\
+\And
+Coauthor \\
+Affiliation \\
+Address \\
+\texttt{email} \\
+\AND
+Coauthor \\
+Affiliation \\
+Address \\
+\texttt{email} \\
+\And
+Coauthor \\
+Affiliation \\
+Address \\
+\texttt{email} \\
+\And
+Coauthor \\
+Affiliation \\
+Address \\
+\texttt{email} \\
+(if needed)\\
+}
+
+% The \author macro works with any number of authors. There are two commands
+% used to separate the names and addresses of multiple authors: \And and \AND.
+%
+% Using \And between authors leaves it to \LaTeX{} to determine where to break
+% the lines. Using \AND forces a linebreak at that point. So, if \LaTeX{}
+% puts 3 of 4 authors names on the first line, and the last on the second
+% line, try using \AND instead of \And before the third author name.
+
+\newcommand{\fix}{\marginpar{FIX}}
+\newcommand{\new}{\marginpar{NEW}}
+\newcommand\sign[1]{\text{sign}\left(#1\right)}
+\newcommand\abs[1]{\left|#1\right|}
+\newcommand\norm[1]{||#1||_2}
+\definecolor{myRed}{HTML}{AA8888}
+\definecolor{maroon}{cmyk}{0,0.87,0.68,0.32}
+
+%\nipsfinalcopy % Uncomment for camera-ready version
+
+\begin{document}
+
+%\maketitle
+%***********************************************************
+% *** THIS puts a figure between title and abstract ***
+%\twocolumn
+%[
+{%
+    %\renewcommand\twocolumn[1][]{#1}%
+    \maketitle
+    \begin{center}
+        \centering
+        \vspace*{-10mm}
+        \fbox{\rule[-.5cm]{0cm}{4cm} \rule[-.5cm]{14cm}{0cm}}
+        % \captionof{figure}
+        % {
+        %   Some caption 
+        % }
+    \end{center}%
+}
+%]
+% ******************************************************
+
+\begin{abstract}
+	The aim of this work is to localize a query photograph by finding other images depicting the same place in a large geotagged image database. The contribution of this paper is as follows. We represent each database image by a Fisher vector and for each vector we learn per-location SVM classifiers. We show that trained and re-normalized SVM weight can be used as an embedded descriptor that replaces original Fisher vector. Though the SVMs were learned independently no further calibration is necessary. We perform two experiments on state-of-the-art datasets for place recognition and we show that our method consistently improves the results for different dimensions of decorrelated Fischer vectors.
+\end{abstract}
+
+\section{Motivation}
+	Internet contains a huge collection of imagery that grows  literally every second. For instance, in 2013 Facebook claimed \cite{imageGrow} that every single minute users upload about 208,300 new images, for Instagrama this number was about  27,800. This makes about 340,000,000 new images per day. Another interesting factor is that every minute users will upload more than 100 hours of video on Youtube. Considering the fact that most of the videos are in HD make these numbers even more impressive.
+
+	Imagine that there was a system that takes a picture from the imagery as an input and it shows you a position on the map indicating where the input image was captured. What would be this system useful for? One could take a picture from his smartphone and use it as an alternative to GPS or to precise localization in urban areas when the GPS was noisy. Surely, it would find its place in security and surveillance applications where one could localize an unknown image or video sequence based on its appearance. An alternative application would be a path reconstruction from a first-person-view or UAV video \c which was cheaper then state-of-the-art SLAM. Interesting may be a localization of scenes in old movies or collecting images from one place and observe how the place has changed over time.
+
+	Indeed, many of these systems already exist \cite{Majdik2013, Torii2011} and have been intensively developed in last decade. In place recognition problems, researchers use many diverse techniques and aim for slightly different goals but the basic idea of the place recognition is the same; There is a structured collection of imagery where each image contains information about its location in the environment. This information can be for instance a GPS location or an image position in the semantic graph. Such a structured image collection is called a database. Given an unknown query image, the goal is to find the most similar image in the database and use its structural information for query localization, e.g. plot its GPS position on the map.
+
+	The structured database may contain from few thousands to couple of millions of images.  To find a similar image in the database is therefore a challenging task. As an example, the query and database images may depict the same 3D object (e.g. building) from a different camera viewpoint, under different illumination conditions or the object can be partially occluded. In addition, the database can be very large. For instance, we estimate that Google Street View of France contains more than 60 million panoramic images. Therefore, we want to represent the images by descriptors that are robust to viewpoint changes, occlusion, illumination conditions and at the same time these descriptors must be low dimensional (or very sparse) in order to perform efficient and chap retrieval in a large database.
+
+
+\section{Related work} 
+\label{sec:overview}
+	Unlike the other work in large scale place recognition~\cite{Gronat2013,Cummins09,Knopp2010,Schindler07} and image retrieval~\cite{Nister06,Philbin07,Sivic2003}, we do not build on the bag-of-visual-words representation~\cite{Csurka04,Sivic2003}. Instead, we use Fisher vectors (FV) \cite{Jegou2011} that are recently finding its place in image retrieval, place recognition \cite{Torii2013} and other computer vision tasks \cite{Simonyan2013, Krapac2011}. These high-dimensional image representations are well-suited for retrieval problems since they are very robust to view-point changes and are more discriminative than standard bag-of-visual-words (BOW). However, the main drawback of FV is that unlike BOW it is dense which makes it nearly unfeasible for usage because of the memory footprint and computational cost.
+
+ 	For the above-mentioned reasons researchers aim on FV optimization. As an example, a nice paper of Perronnin et al. \cite{Perronnin2010} focuses on analysis and compression of FV for image retrieval. They explain how the FV is related to BOW and underline that power-normalization of FV is equivalent to a burstiness features suppression \cite{Jegou2009}. They benefit from the fact that as the power~$\alpha$ goes to zero the {$\alpha$-normalized} Fisher vector converges to a ternary representation which can be efficiently binarized. They compared their method with the Local Sensitive Hashing and the Spectral Hashing and showed comparable results while achieving only 520~bits signature per image. This encouraging result have been outperformed by Jegou et al. \cite{Jegou2011} who achieved comparable results with just 128~bits signature by using dot product quantizers. Hence, the Fisher vectors can be significantly compressed by appropriate indexing. In general, these results have been achieved by optimizing:
+ 	
+ 	\begin{enumerate}[(i)]
+ 		\item the aggregation of local image descriptors (FV)
+ 		\item the dimensionality reduction (e.g. PCA, Mahalanobis metric, whitening)
+ 		\item the indexing algorithm (eg. dot-product quantizers, LSH, SH)
+ 	\end{enumerate}
+
+ 	The lower the dimension before indexing step (iii) is the lower size of the signature is achieved after indexation. Therefore it is very important to project the FV into lower dimension. There are different methods for (ii) among which the very popular is PCA. This method, however, has a drawback. It discards uncorrelated `noisy' dimensions that can actually contain discriminative information for image retrieval.This problem have been addressed in \cite{Simonyan2013}. They use a labeled training data and utilize discriminative learning in order to learn a global low-rank metric which can be decomposed to a linear projection to low-dimensional space. Our method aim on improving the performance of the projected FV, hence it could be viewed as an intermediate step between (ii) and (iii) into the scheme above.
+
+\section{Approach overview}
+	Our setup is similar to approach of \cite{Gronat2013} where authors learn a set of per-location classifiers for place recognition, one per each location in the map. In that paper they use a BOW representation and emphasize that subsequent classifier calibration is a critical issue.  Due to the calibration procedure the method is less efficient in terms of computational cost and is hard to scale up. Need for calibration has been also reported in \cite{Malisiewicz11} where they learn per-exemplar SVM classifiers on HOG representation for object retrieval. 
+	We aim on embedding FVs in order to achieve better performance by learning. In contrast to above-mentioned papers, our method with FVs works per-se without need of any further calibration and can be therefore subsequently compressed by an indexing algorithm \cite{Jegou2011}. In addition, it does not increase the dimensionality of the problem as if it would be the case for sparse image representation.
+
+ 	Rather then global approach we propose to treat FVs locally. We aim on learning a SVM weight in turn for each FV in such a way that this weight can be subsequently used as a new descriptor that replaces the original FV. Our method could be plugged into the scheme above as an intermediate step before indexing. To achieve the goal, for each FV in turn we: (i) collect hard negatives for given FV, (ii) learn a linear SVM weight (iii) and re-normalize the learned weight. At query time we compute a FV for the query image and measure its similarity with database images by computing a dot-product between the FV and each of the re-normalized SVM weights. We observe that learned re-normalized weight does not differ to much from the original FV. Loosely speaking, we embedded the information about hard negative exemplars into the original FV. The details will be given later in the text.
+
+ 	
+	The main contributions of this paper are as follows: 
+	We show that trained and re-normalized SVM weight can be used as an embedded descriptor that outperforms the original one without need for further calibration. We perform two experiments on state-of-the-art dataset for place recognition and we show that our method consistently improves the results for (i) different PCA dimensions and (ii) over all recall@K metric shortlist, i.e. the rate of relevant images that are ranked in top K positions.
+
+	The rest of the paper is organized as follows:
+	In section \ref{sec:FV} we first give a brief overview of FV implementation for image retrieval. Then, in section \ref{sec:perLoc}, we the explain how the per-location classifiers are trained  and finally in section \ref{sec:exp} we present our experimental results along with implementation details.
+
+\section{Fisher vector overview}
+\label{sec:FV}
+	\textcolor{myRed}{(This is a minimalistic overview of what the FV is. This can be omited or shrinked but I think it is worth since many people are not familiar with FV)}\newline
+	The Fisher vector can be thought of as an extension of BOW \cite{Sivic2003} that is achieved by considering a high-order statistics of the distribution of the feature descriptors. It aggregates a large set of descriptors into a high-dimensional representation of the fixed size. In the following text we briefly overview some basic concepts of Fisher vectors, its normalization and standard dimensionality reduction.
+
+	\subsection{Computing Fisher vectors}
+		It first starts with learning a generative model of the local image descriptors $x$ of the dimension~$d$ (in our case we use SIFT features, see details in Sec. \ref{sec:exp}). The model is assumed to follow a GMM with $N$ components and diagonal covariances. This model can be understood as a probabilistic visual vocabulary. Having the model trained, the Fisher vector of the sample of the image descriptors is computed as a gradient of the sample's likelihood with respect to the learned parameters of the GMM, which is subsequently scaled by inverse square root of the Fisher information matrix \cite{Perronnin2007}. Considering only the derivatives w.r.t. the mean and covariances, we a obtain representation which captures the average of the first and second order differences between the descriptors and each of the GMM center $k$. For the image containing $T$ feature vectors it can be expressed as follows:
+		
+		\begin{align}
+			\Phi^{(1)}_k&=
+			\dfrac{1}{N \sqrt(w_k)}\sum_{j=1}^{T} \alpha_j(k) \left(
+			\dfrac{x_j-\mu_k}{\sigma_k}
+			\right)
+			\label{eq:FVmean}
+			\\
+			\Phi^{(2)}_k&=
+			\dfrac{1}{N \sqrt(2w_k)}\sum_{j=1}^{T} \alpha_j(k) \left(
+			\dfrac{(x_j-\mu_k)^2}{\sigma_k^2}-1 
+			\right)
+			\label{eq:FVvar}
+		\end{align}
+
+		\noindent
+		where $w_k, \mu_k$ and $\sigma_k$ are weight, mean and diagonal of covariance matrix for $k$-th component of the learned GMM and $\alpha_j(k)$ is a soft assignment of the $j$-th feature $x_j$ to the Gaussian $k$. The resulting Fisher vector  $\Phi$ is then concatenation of these gradients which forms into a $2Nd$ dimensional vector such that $\Phi=[\Phi^{(1)T}_1,\Phi^{(2)T}_1,...,\Phi^{(1)T}_N,\Phi^{(2)T}_N]^T$.
+
+		While some works, e.g.\cite{Perronnin2010}, use only a partial derivatives w.r.t. the mean parameters (equation~\eqref{eq:FVmean}), we use partial derivatives both w.r.t. the mean and variance because this approach have been implemented in a library that we used (details are provided in section \ref{sec:exp}). As reported in \cite{Jegou2010} both approaches provide comparable results.
+
+		\subsection{Normalization}
+			As in the case of standard BOW, the $L2$ normalization is a natural way to measure similarity between two FVs by a dot-product. However it has been shown that direct $L2$ normalization is suboptimal and better performance can be achieved by power-normalization followed by $L2$ normalization. Thus the normalization operator can be written as follows:
+			
+			\begin{equation}
+				L(z)=\dfrac{\text{sign} (z) \abs{z}^\alpha}{\norm{\text{sign}(z) \abs{z}^\alpha}}
+				\label{eq:Loperator}
+			\end{equation}
+
+			\noindent
+			where power $\alpha \in (0,1)$. As mentioned in the introduction, the power-normalization has the effect of suppression of the descriptors that occur frequently in the image (bursty features), these can be for instance periodical structures such as skyscraper windows or bricks of the wall. In our setup we use $\alpha=0.5$ as it has been reported by Jegou et al. \cite{Jegou2012HAL} that this value is optimal for wide range of GMM components $N$.
+
+		\subsection{Dimension reduction}
+			The resulted Fisher vector is a high-dimensional representation of an image, which dimensionality depends only on number of $N$ components of the GMM and dimension $d$ of the local image descriptors which is fixed. In practice, the PCA is being used for decorrelation and projection to a lower dimensional space because it subsequently directly affects a size of the indexed signature (see Sec. \ref{sec:overview} and \ref{Jegou2011}).
+
+			We observed that after the PCA decorrelation it is important to $L2$ re-normalize projected FV to achieve better performance. Our interpretation is that after performing the PCA the higher dimensions contain a noise that affects only a magnitude of the projected vectors but not its direction \textcolor{myRed}{Figure or not?}. Furthermore we observed that even slightly better results can be achieved by using the normalization operator \eqref{eq:Loperator} instead of $L2$. This is just an empirical result and we do not have any explanation for it.
+
+			Finally, it is worth noting that PCA projection into a `not-too-low' dimensional space can actually slightly improve the performance of the full FV. What that `not-too-low' actually means have been partially discussed in \cite{Jegou2012HAL}. However, in general as the dimension decreases the performance of decorrelated FV decrease which is, indeed, what we observe in our experiments. In the next section we therefore aim on enhancing the performance of projected FVs.   
+
+
+\section{Per-location classifiers and Fischer vector embedding}
+\label{sec:perLoc}
+	In place recognition there are different definitions of what \emph{the place} means. The definition depends on the goal of the particular task. Should it be a pose of the camera or is it an ID of a building in the image? In our problem, \emph{the place} is defined as an associated GPS location of the database image that captures the same scene as does the query image. 
+
+	Each database image $j$ is represented by its Fisher vector $\Phi_j$. The goal is to learn a set of functions $f_j$, one per each database image, such that at query time, given the Fisher vector $\Phi_q$ of an unknown query image, we can either retrieve the the correct database image as the image $j^*$ with the highest score
+
+   \begin{equation}
+	   \label{eq:class}
+	    j^*=\operatorname*{arg\;max}_{j} f_j(\Phi_q) 
+   \end{equation}
+
+   \noindent
+    or use these scores to rank candidate images and use geometric verification to try and identify the correct location in an $n$-best list. Rather then tackle the problem as multi class learning we follow the approach of \cite{Malisiewicz11} and \cite{Gronat2013} and we learn $f_j$ independently for each image in turn. We aim on replacing the original database Fisher vector $\Phi$ with some new vector $w_j$ that performs better. Hence, the function $f_j$ from eq. \eqref{eq:class} can be defined as linear function
+
+    \begin{equation}
+    	f_j(\Phi_q)=\dfrac{w_j^T}{\norm{w_j}}\cdot \Phi_q
+    	\label{eq:linreg}
+    \end{equation}
+    .
+
+    \subsection{Learning SVMs}
+
+    	 Our goal is to learn a linear regressor $w_j$ by using SVM which convex objective can be formulated as follows
+
+    	\begin{align}
+	        \Omega(w_j,b_j)=||w_j||^{2}& +C_1\sum_{\Phi\in \mathcal P_j}h(w_j^T\Phi+b_j)
+	                         +C_2\sum_{\Phi\in \mathcal N_j}h(-w_j^T\Phi-b_j)
+	       	\label{eq:obj} 
+      	\end{align}
+
+      	where $\Phi$ are FVs from training data, $\norm{w_j}$ is a regularization term, $h$ is a penalty function and $C_1$, $C_2$ are penalty weights for positive $\mathcal P_j$ or negative $\mathcal N_j$ data. Let us first explain what are the training data and later analyze behavior of the formulation \eqref{eq:obj}.
+    \subsection{Training data}
+      	The negative training data set $\mathcal N_j$ contains hard negative examples of the image $j$. These hard negatives are database images that are spatially far-away from image $j$ and, at the same time, have a high similarity score with image $j$ measured by a dot-product of its FVs. This approach follows the simple idea of \cite{Knopp2010} that far-away images do not share the same visual content. A GPS information associated with each database image allows us to construct such a negative set for each image $j$ in turn. Details are provided in experimental section \ref{sec:exp}.
+
+      	The positive training data set $\mathcal P_j$ is represented by the only image $j$ itself. Why is that? It comes from the nature of the dataset. One could find additional positive examples by taking adjacent panorama images and building a graph where each node represents an image and each edge represents a visual overlap. However, due to the panorama sampling density during the capturing process of the Google Street View it is very rare to detect a visual overlap between two adjacent panoramas. Instead, very often the detected visual overlap is between the images that come from the same panorama and differ by a homography. We found that there is no benefit from taking these images into account.
+
+    \subsection{Limit case behavior}
+      	The convex objective \eqref{eq:obj} consist of regularization term a two penalty terms with weights $C_1$ and $C_2$. Lets assume for the moment that the weight of the negative data penalty $C_2 \rightarrow 0$. Then the regularization term and the first penalty term dominates the equation \eqref{eq:obj}. Since $\mathcal P_j$ contain only a single positive training data, the sum from eq. \eqref{eq:obj} becomes
+
+      	\begin{equation}
+      		C_1\sum_{\Phi\in \mathcal P_j}h(w_j^T\Phi+b_j)=C_1 \cdot h(w_j^T\Phi^++b_j)
+      		\label{eq:penalty}
+      	\end{equation}
+
+      	where $\Phi^+$ denotes a single FV. Any weight $w_j$ can be decomposed into parallel and orthogonal direction w.r.t. $\Phi^+$ such that $w_j=w_j^{\perp}+w_j^{||}$. If the orthogonal part was removed it would not affect the value of the penalty \eqref{eq:penalty} since $(w_j^{\perp}+w_j^{||})^T\Phi^+=w_j^{|| T} \Phi^+$ but the regularization term would decrease. \textcolor{myRed}{Can we do this in dual?}
+
+      	This means that as we decrease the penalty weight $C_2$ the optimal $w_j^*$ is close to being parallel with the original Fisher vector $\Phi^+$ and its norm goes to zero. The re-normalized $w_j^*$ is therefore almost identical with $\Phi^+$. As we increase the weight $C_2$ the optimal $w_j^*$ declines from the original FV and this declination depends on (i) distribution of the negative data and (ii) the value of $C_2$. Loosely speaking, the parameter $C_2$ designates how much information amount hard negative examples wil be embedded int $w_j^*$
+
+      	As a conclusion, for certain setting of the parameters $C_1$ and $C_2$ the learned $w_j^*$ is slightly declined from the original Fisher vector in such a way that it is better separated from the hard negative examples. The details of picking the parameters are given in the following section.
+
+      	\textcolor{myRed}{(TODO: In Results show (i) how much it differs e.g. dot product with original FV, (ii) how the performance changes with C2 e.g. x-validation plot or just plot.)}
+
+\section{Experimental evaluation}
+\label{sec:exp}
+	\textcolor{myRed}{(TODO: Show calibrated BOW, why we are not showing calibrated FV, argue for it. Emphasize that the goal was achieved. Highlight its benefits!)}
+	In this section we first describe the experimental datasets, then we give implementation details and finally compare performance of the proposed approach on two datasets with several baseline methods.
+
+	%%%%%%%%%%%%%%%%%%%%%%%%%%
+   	\subsection{Image datasets}
+   	%%%%%%%%%%%%%%%%%%%%%%%%%%
+   		\textcolor{myRed}{(Another image retrieval datasets? INRIA Holliday, Sun, etc., it could be doable, but we have to find a FV competitor)}\newline
+		We performed our experiments on a database of Google Street View images from the Internet. For evaluation we have used two datasets. The first one is identical to \cite{Gronat2013, Torii2011} ($25k$ of images), the latter one is an extension extension of this dataset to achieve a higher spatial density ($55k$ of images).
+
+		We downloaded panoramas from Pittsburgh (U.S.) covering roughly an area of $1.3 \times 1.2 \; {\rm km}^2$. Similar to~\cite{Chen11}, for each panorama we generate 12 overlapping perspective views corresponding to two different elevation angles to capture both the street-level scene and the building fa\c{c}ades, resulting in a total of 24 perspective views each with $90^\circ$ FOV and resolution of $960 \times 720$ pixels.
+
+		As a query set with known ground truth GPS positions, we use the 8999 panoramas from the Google Street View research dataset, which cover approximately the same area, but were captured at a different time, and typically depict the same places from different viewpoints and under different illumination conditions. For each test panorama, we generate perspective images as described above. Finally, we randomly select out of all generated perspective views a subset of 4k images, which is used as a test set to evaluate the performance of the proposed approach.
+
+	%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+   \subsection{Implementation details}
+   %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+	   	\paragraph{SIFT features:}
+	   		For all images in turn SIFT local descriptors~\cite{Lowe04} are extracted and subsequently these features are converted to a rootSIFT \cite{Arandjelovic12}. For extraction we use publicly available library {\tt vlfeat}~\cite{vlfeat}.
+	    
+	    \vspace{-4mm}
+	   	\paragraph{BOW baseline:}	
+	    	A vocabulary of 100k visual words is learned by approximate k-means clustering~\cite{Philbin07} from a subset of features from 5,000 randomly selected images. A tf-idf~\cite{Sivic2003} vector is computed for each image by assigning each descriptor to the nearest cluster center.  Finally, all tf-idf vectors are normalized to have unit $L_2$ norm.
+
+	    \vspace{-4mm}
+	    \paragraph{Fisher vector baseline:}
+	    	We first begin with decorrelation of local descriptors. We train a PCA matrix on a set of descriptors of 5,000 randomly selected database images and we project all rootSIFT descriptors into a $d=64$ dimensional space. Then we learn a generative GMM that consist of $N=256$ components. We train this model on a set of decorrelated descriptors from 5,000 randomly selected database images.
+
+	    	It follows by learning a PCA for FV decorrelation. The resulting dimension of full FV is $2Nd=32,768$. To learn a reasonable non-singular PCA matrix we need at least this amount of data which we do not have for the first dataset which consists of only 25k images. For both databases we use all available data to train the PCA and we underline that for the first $25k$ dataset the projection to $d'>25k$ is meaningless since the PCA matrix was singular.
+
+	    	Finally, to compute the FV of an image we (i) compute the rootSIFTs and perform the PCA decorrelation to $d=64$ space, (ii) use the learned GMM and decorrelated descriptors to compute full FV (iii) project the full FV into lower dimensional spaces, namely to $2^\beta$ where $\beta=7\dots 14$ and (iv) re-normalize projected FVs by operator \eqref{eq:Loperator}.
+
+	    \vspace{-4mm}
+	    \paragraph{Learning vectors:}
+			To learn the linear regressor \eqref{eq:linreg} for database image $j$, the positive and negative training data is constructed as follows. 
+			The \emph{negative training set} $\mathcal N_j$ is obtained by: (i) finding the set of images with geographical distance greater than $200{\rm m}$; (ii)  sorting the images by decreasing value of similarity to image $j$ measured by the dot product between their respective Fisher vectors; (iii) taking the top $N=500$ ranked images as the negative set. 
+			In other words, the negative training data consists of the hard negative images, i.e. those that are very similar to image $j$ but are far away from its geographical position, hence, cannot have the same visual content. The \emph{positive training set} $\mathcal P_j$ consist of the only image $j$ itself.
+
+			For SVM training we use {\tt libsvm} \cite{libsvm} with $L2$ regularizer and $L2$-loss penaty fucntion $h(x)$ from equation \eqref{eq:obj}. To obtain parameters $C_1$ and $C_2$ we perform a grid search and evaluate the performance on held out test set. We observe that for different FV target PCA dimensions the parameter $C_1$ is quite stable (typically $C_1=1$) while the optimal parameter for $C_2$ differs between $10^{-6}$ to $10^{-1}$.
+
+			To learn the new image representation from FVs, for each database image $j$ in turn we (i) learn SVM from $\mathcal P_j$ and $N_j$ (ii) $L2$ normalize learned $w_j$ (iii) use this vector as the new image representation. At query time we compute a FV $\Phi_q$ of the query image and measure its similarity score to each database image by equation \eqref{eq:linreg}.
+		
+		\vspace{-4mm}
+		\paragraph{Ground truth:}
+			Since all the query images have associated GPS location we can compute the spatial distance from database image. We consider query image to be correctly localized if its retrieved database image lies within a perimeter of $20m$ from the query image.
+	
+	\subsection{Results}
+		For each database we compare our results to two baselines: a standard BOW baseline and a Fisher vector baseline. We measure our performance by recall@K metric which is the portion of query images that have at least one relevant image inside its ranked shortlist of the length $K$. We perform our experiments on several target FV dimensions as shown in the figure \ref{fig:recall}.
+
+		\begin{figure}
+		\centering
+		\includegraphics[width=\linewidth]{evaluationWOWplot}	
+		\caption{
+			\textcolor{myRed}{Fake results, actually SF, no embedded FV curves}
+			Recall curves for different methods
+		}
+		\label{fig:recall}
+		\end{figure}
+
+		It is noticeable that proposed method outperforms all baselines and consistently improves the performance of the original FV over all lengths $K$ of the shortlist and all target FV dimensions. This particularly means that learned descriptors are more likely to attract relevant images into top$K$ shortlist. The results are summarized in table \ref{tab:recall}.
+
+\begin{table}
+\begin{centering}
+	\begin{tabularx}{0.6\linewidth}{c|c c c c c|c c c c c}
+		\hline 
+		\rowcolor{maroon!50}
+		recall@K [$\%$] & \multicolumn{5}{c|}{25k Pittsburgh} & \multicolumn{5}{c|}{55k Pittsburgh} \\
+		\hline 
+		\hline 
+		\rowcolor{maroon!50}
+		Method: & 1 & 2 & 5 & 10 & 20 & 1 & 2 & 5 & 10 & 20\\
+		\hline
+		\rowcolor{maroon!10}
+		BOW & 22 & 24 & 31 & 34 & 38 &  &  &  &  & \\
+		\rowcolor{maroon!10}
+		FV256 & 37 & 39 & 46 & 52 & 56 &  &  &  &  & \\
+		\rowcolor{maroon!10}
+		svmFV256 & 40  & 42 & 55 & 59 &  &  &  &  &  & \\
+		\rowcolor{maroon!10}
+		FV1024 &  &  &  &  &  &  &  &  &  &  	\\
+		\rowcolor{maroon!10}
+		FV2048 &  &  &  &  &  &  &  &  &  & \\
+		\rowcolor{maroon!10}
+		FV4096 & etc....  &  &  &  &  &  &  &  &  &  \\
+		\hline
+	\end{tabularx}
+	\caption{ \textcolor{myRed}{Fake results!}
+		The percentage of correctly localized test queries for which the topK ranked database image is within $20$ meters from the ground truth query position. The proposed method (svmFV) outperforms the baseline methods.
+		}
+	\label{tab:recall}
+\end{centering}
+\end{table}
+
+
+\section{Conclusions}
+
+
+
+
+
+\small{
+	\bibliographystyle{spmpsci}
+	\bibliography{shortstrings,vggroup,cvww_template,mybib}
+	}
+
+
+\end{document}

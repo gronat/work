@@ -1,0 +1,155 @@
+\begin{thebibliography}{10}
+\providecommand{\url}[1]{{#1}}
+\providecommand{\urlprefix}{URL }
+\expandafter\ifx\csname urlstyle\endcsname\relax
+  \providecommand{\doi}[1]{DOI~\discretionary{}{}{}#1}\else
+  \providecommand{\doi}{DOI~\discretionary{}{}{}\begingroup
+  \urlstyle{rm}\Url}\fi
+
+\bibitem{Arandjelovic12}
+Arandjelovi\'c, R., Zisserman, A.: Three things everyone should know to improve
+  object retrieval.
+\newblock In: IEEE PAMI (2012)
+
+\bibitem{Chen11}
+Chen, D., Baatz, G., K{\"o}ser, Tsai, S., Vedantham, R., Pylvanainen, T.,
+  Roimela, K., Chen, X., Bach, J., Pollefeys, M., Girod, B., Grzeszczuk, R.:
+  City-scale landmark identification on mobile devices.
+\newblock In: CVPR (2011)
+
+\bibitem{Csurka04}
+Csurka, G., Bray, C., Dance, C., Fan, L.: Visual categorization with bags of
+  keypoints.
+\newblock In: Workshop on Statistical Learning in Computer Vision, ECCV, pp.
+  1--22 (2004)
+
+\bibitem{Cummins09}
+Cummins, M., Newman, P.: Highly scalable appearance-only {SLAM} - {FAB-MAP}
+  2.0.
+\newblock In: Proceedings of Robotics: Science and Systems. Seattle, USA (2009)
+
+\bibitem{libsvm}
+Fan, R.E., Chang, K.W., Hsieh, C.J., Wang, X.R., Lin, C.J.: {LIBLINEAR}: A
+  library for large linear classification.
+\newblock J. Machine Learning Research \textbf{9}, 1871--1874 (2008)
+
+\bibitem{Gronat2013}
+Gronat, P., Obozinski, G., Sivic, J., Pajdla, T.: Learning and calibrating
+  per-location classifiers for visual place recognition.
+\newblock In: CVPR, pp. 907--914. IEEE (2013).
+\newblock
+  \urlprefix\url{http://dblp.uni-trier.de/db/conf/cvpr/cvpr2013.html#GronatOSP13}
+
+\bibitem{imageGrow}
+Horaczek, S.: How many photos are uploaded to the internet every minute?
+  (2014).
+\newblock
+  \urlprefix\url{http://www.popphoto.com/news/2013/05/how-many-photos-are-uploaded-to-internet-every-minute}
+
+\bibitem{Jegou2009}
+Jegou, H., Douze, M., Schmid, C.: On the burstiness of visual elements.
+\newblock In: CVPR, pp. 1169--1176 (2009)
+
+\bibitem{Jegou2011}
+J{\'e}gou, H., Douze, M., Schmid, C.: {Product Quantization for Nearest
+  Neighbor Search}.
+\newblock IEEE PAMI \textbf{33}(1), 117--128 (2011).
+\newblock \doi{10.1109/TPAMI.2010.57}.
+\newblock \urlprefix\url{http://hal.inria.fr/inria-00514462/en/}
+
+\bibitem{Jegou2010}
+J{\'e}gou, H., Douze, M., Schmid, C., P{\'e}rez, P.: {Aggregating local
+  descriptors into a compact image representation}.
+\newblock In: {CVPR 2010 - 23rd IEEE Conference on Computer Vision \& Pattern
+  Recognition}, pp. 3304--3311. IEEE Computer Society, San Francisco, United
+  States (2010).
+\newblock \doi{10.1109/CVPR.2010.5540039}.
+\newblock \urlprefix\url{http://hal.inria.fr/inria-00548637}
+
+\bibitem{Jegou2012HAL}
+J{\'e}gou, H., Perronnin, F., Douze, M., S{\'a}nchez, J., P{\'e}rez, P.,
+  Schmid, C.: {Aggregating local image descriptors into compact codes}.
+\newblock IEEE Transactions on Pattern Analysis and Machine Intelligence
+  \textbf{34}(9), 1704--1716 (2012).
+\newblock \doi{10.1109/TPAMI.2011.235}.
+\newblock \urlprefix\url{http://hal.inria.fr/inria-00633013}.
+\newblock QUAERO
+
+\bibitem{Knopp2010}
+Knopp, J., Sivic, J., Pajdla, T.: Avoidng confusing features in place
+  recognition.
+\newblock In: ECCV (2010)
+
+\bibitem{Krapac2011}
+Krapac, J., Verbeek, J., Jurie, F.: {Modeling Spatial Layout with Fisher
+  Vectors for Image Categorization}.
+\newblock In: {ICCV 2011 - International Conference on Computer Vision}, pp.
+  1487--1494. IEEE, Barcelona, Spain (2011).
+\newblock \doi{10.1109/ICCV.2011.6126406}.
+\newblock \urlprefix\url{http://hal.inria.fr/inria-00612277}
+
+\bibitem{Lowe04}
+Lowe, D.: Distinctive image features from scale-invariant keypoints.
+\newblock IJCV \textbf{60}(2), 91--110 (2004)
+
+\bibitem{Majdik2013}
+Majdik, A., Albers-Schoenberg, Y., Scaramuzza, D.: Mav urban localization from
+  google street view data.
+\newblock In: IROS, pp. 3979--3986. IEEE (2013).
+\newblock
+  \urlprefix\url{http://dblp.uni-trier.de/db/conf/iros/iros2013.html#MajdikAS13}
+
+\bibitem{Malisiewicz11}
+Malisiewicz, T., Gupta, A., Efros, A.A.: Ensemble of exemplar-svms for object
+  detection and beyond.
+\newblock In: ICCV (2011)
+
+\bibitem{Nister06}
+Nister, D., Stewenius, H.: Scalable recognition with a vocabulary tree.
+\newblock In: CVPR (2006)
+
+\bibitem{Perronnin2007}
+Perronnin, F., Dance, C.R.: Fisher kernels on visual vocabularies for image
+  categorization.
+\newblock In: CVPR (2007)
+
+\bibitem{Perronnin2010}
+Perronnin, F., Liu, Y., Sánchez, J., Poirier, H.: Large-scale image retrieval
+  with compressed fisher vectors.
+\newblock In: CVPR, pp. 3384--3391. IEEE (2010).
+\newblock
+  \urlprefix\url{http://dblp.uni-trier.de/db/conf/cvpr/cvpr2010.html#PerronninLSP10}
+
+\bibitem{Philbin07}
+Philbin, J., Chum, O., Isard, M., Sivic, J., Zisserman, A.: Object retrieval
+  with large vocabularies and fast spatial matching.
+\newblock In: CVPR (2007)
+
+\bibitem{Schindler07}
+Schindler, G., Brown, M., Szeliski, R.: City-scale location recognition.
+\newblock In: CVPR (2007)
+
+\bibitem{Simonyan2013}
+Simonyan, K., Parkhi, O.M., Vedaldi, A., Zisserman, A.: {F}isher {V}ector
+  {F}aces in the {W}ild.
+\newblock In: British Machine Vision Conference (2013)
+
+\bibitem{Sivic2003}
+Sivic, J., Zisserman, A.: {Video Google}: {A} text retrieval approach to object
+  matching in videos.
+\newblock In: ICCV (2003).
+\newblock \urlprefix\url{http://www.robots.ox.ac.uk/~vgg}
+
+\bibitem{Torii2011}
+Torii, A., Sivic, J., Pajdla, T.: Visual localization by linear combination of
+  image descriptors.
+\newblock In: ICCV Workshops, pp. 102--109. IEEE (2011).
+\newblock
+  \urlprefix\url{http://dblp.uni-trier.de/db/conf/iccvw/iccvw2011.html#ToriiSP11}
+
+\bibitem{Torii2013}
+Torii, A., Sivic, J., Pajdla, T., Okutomi, M.: Visual place recognition with
+  repetitive structures.
+\newblock In: CVPR (2013)
+
+\end{thebibliography}
