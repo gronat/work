@@ -194,7 +194,7 @@ Address \\
 	or use these scores to rank candidate images and use geometric verification to try and identify the correct location in an $n$-best list. Rather then tackle the problem as multi class learning we follow the approach of \cite{Malisiewicz11} and \cite{Gronat2013} and we learn $\Psi_j$ independently for each image in turn using per-exemplar SVM. We aim on replacing the original database Fisher vector $\Phi$ with some new vector $\Psi$ that performs better in sense of separation from hard negative examples and that has unit $L2$-norm in order to measure the similarity by a dot-product (eq. \eqref{eq:class}).
 
 
-	To achieve the goal we will use relaxed form per-exemplar SVM formulation. The SVM convex objective can be formulated as follows
+	To achieve the goal we will solve the per-exemplar SVM problem and then relax the solution. The per-exemplar SVM can be written as
 
 	\begin{align}
         \operatorname*{arg\;min}_{w_j, b_j}
@@ -207,9 +207,8 @@ Address \\
   	Clearly, the $w_j$ can be of an arbitrary norm  which depends on penalty parameters $C_1,\;C_2$ and training data. To find the unit vector $\Psi$ we will relax the SVM problem in two steps: (i) We use SVM for ranking problem which is independent on $b_j$. (ii) Rather than normalizing $w_j$ by additional constraint in objective \eqref{eq:obj} we first solve the SVM and then re-normalize $w_j$. The resulting vector $\Psi$ can be then written as
 	  	\begin{equation}
 	  		\Psi_j=\dfrac{w_j}{||w_j||}
-	  	\end{equation}
+	  	\end{equation}.
 
-  	The vector $\Psi_j$ can be interpreted as a direction that separates the training thata in an optimal way.
 
 
     \subsection{Training data}
@@ -217,19 +216,40 @@ Address \\
 
       	The positive training data set is represented by the only image $j$ itself. Why is that? It comes from the nature of the dataset. One could find additional positive examples by taking adjacent panorama images and building a graph where each node represents an image and each edge represents a visual overlap. However, due to the panorama sampling density during the capturing process of the Google Street View it is very rare to detect a visual overlap between two adjacent panoramas. Instead, very often the detected visual overlap is between the images that come from the same panorama and differ by a homography. We found that there is no benefit from taking these images into account.
 
-\section{Why does exemplar-svm works}
-  	The convex objective \eqref{eq:obj} consist of regularization term a two penalty terms with weights $C_1$ and $C_2$. We will show that if $C_2 \rightarrow 0$ the $\Psi_j \rightarrow \Phi^+_j$.
+\section{Why does exemplar-SVM works}
+  	The convex objective \eqref{eq:obj} consist of regularization term a two penalty terms with weights $C_1$ and $C_2$. We will show that if $C_2 \rightarrow 0$ the resulting $w_j$ is going to be parallel with $\Phi_j^+$, hence $\Psi_j \rightarrow \Phi^+_j$.
 
-  	Lets assume for the moment that the weight of the negative data penalty $C_2 \rightarrow 0$. Then the regularization term and the first penalty term dominates the equation \eqref{eq:obj}. Since $\mathcal P_j$ contain only a single positive training data, the sum from eq. \eqref{eq:obj} becomes
+  	Lets assume for the moment that the weight of the negative data penalty $C_2 \rightarrow 0$. Then the regularization term and the first penalty term dominates the equation \eqref{eq:obj}. Any arbitrary vector $w_j$ can be decomposed into parallel and orthogonal direction w.r.t. $\Phi_j^+$ such that $w_j=w_j^{\perp}+w_j^{||}$, hecnce the convex objective \eqref{eq:obj} can be rewritten as
 
-  	\begin{equation}
-  		C_1\sum_{\Phi\in \mathcal P_j}h(w_j^T\Phi+b_j)=C_1 \cdot h(w_j^T\Phi^++b_j)
-  		\label{eq:penalty}
-  	\end{equation}
+ 	\begin{align}
+        ||w_j^{\perp}+w_j^{||}||^{2}& +C_1 \cdot h((w_j^{\perp}+w_j^{||})^T\Phi^+_j+b_j)
+                         +C_2\sum_{\Phi\in \mathcal N_j}h(-(w_j^{\perp}+w_j^{||})^T\Phi-b_j) 	
+       	\label{eq:decomposed} 
+  	\end{align}
 
-  	where $\Phi^+$ denotes a single FV. Any weight $w_j$ can be decomposed into parallel and orthogonal direction w.r.t. $\Phi^+$ such that $w_j=w_j^{\perp}+w_j^{||}$. If the orthogonal part was removed it would not affect the value of the penalty \eqref{eq:penalty} since $(w_j^{\perp}+w_j^{||})^T\Phi^+=w_j^{|| T} \Phi^+$ but the regularization term would decrease. \textcolor{myRed}{Can we do this in dual?}
+  	If the orthogonal part $w_j^{\perp}$ was removed the equation \eqref{eq:decomposed} becomes
 
-  	This means that as we decrease the penalty weight $C_2$ the optimal $w_j^*$ is close to being parallel with the original Fisher vector $\Phi^+$ and its norm goes to zero. The re-normalized $w_j^*$ is therefore almost identical with $\Phi^+$. As we increase the weight $C_2$ the optimal $w_j^*$ declines from the original FV and this declination depends on (i) distribution of the negative data and (ii) the value of $C_2$. Loosely speaking, the parameter $C_2$ designates how much information amount hard negative examples wil be embedded int $w_j^*$
+ 	\begin{align}
+        ||w_j^{||}||^{2}& +C_1 \cdot h(w_j^{||T}\Phi^+_j+b_j)
+                         +C_2\sum_{\Phi\in \mathcal N_j} h(-w_j^{||T}\Phi-b_j) 	
+       	\label{eq:removed} 
+  	\end{align}
+
+  	Notice that this operation has affected only two terms. The negative data penalty term has changed, however this change was negligible since $C_2 \rightarrow 0$. The regularization term always decreases, while the positive data penalty term does not change due to the orthogonality. This means that as we decrease the penalty weight $C_2$ the optimal $w_j^*$ is close to being parallel with the original Fisher vector $\Phi_j^+$ as shown in Figure \ref{fig:C2effect}. The re-normalized $w_j^*$ is therefore almost identical with $\Phi^+$. As we increase the weight $C_2$ the optimal $w_j^*$ declines from the original FV and this declination depends on (i) distribution of the negative data and (ii) the value of $C_2$ w.r.t. $C_1$ Loosely speaking, the parameter $C_2$ designates how much information about hard negative examples wil be embedded in $w_j^*$.
+
+\begin{figure*}[t!]
+    \centering
+	    \begin{minipage}{0.48\linewidth}
+	        \centering
+	        \fbox{\rule[-.5cm]{0cm}{4cm} \rule[-.5cm]{6cm}{0cm}}
+	    \end{minipage}
+	    \begin{minipage}{0.48\linewidth}
+	        \centering
+	        \fbox{\rule[-.5cm]{0cm}{4cm} \rule[-.5cm]{6cm}{0cm}}
+	    \end{minipage}
+    \caption{An illustration of the effect of decreasing a parameter $C_2$. As the paramterer $C_2$ is decreased the resulting vector $w$ is being parallel to $\Phi^+$.}
+    \label{fig:C2effect}
+\end{figure*}
 
   	As a conclusion, for certain setting of the parameters $C_1$ and $C_2$ the learned $w_j^*$ is slightly declined from the original Fisher vector in such a way that it is better separated from the hard negative examples. The details of picking the parameters are given in the following section.
 
