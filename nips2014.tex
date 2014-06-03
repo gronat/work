@@ -131,7 +131,7 @@ Address \\
 	We show that trained and re-normalized SVM weight can be used as an embedded descriptor that outperforms the original one without need for further calibration. We perform two experiments on state-of-the-art dataset for place recognition and we show that our method consistently improves the results for (i) different PCA dimensions and (ii) over all recall@K metric shortlist, i.e. the rate of relevant images that are ranked in top K positions.
 
 	The rest of the paper is organized as follows:
-	In section \ref{sec:FV} we first give a brief overview of FV implementation for image retrieval. Then, in section \ref{sec:perLoc}, we the explain how the per-location classifiers are trained  and finally in section \ref{sec:exp} we present our experimental results along with implementation details.
+	In section \ref{sec:FV} we first give a brief overview of FV implementation for image retrieval. Then, in section \ref{sec:perExemplar}, we the explain how the per-location classifiers are trained  and finally in section \ref{sec:exp} we present our experimental results along with implementation details.
 
 \section{Fisher vector overview}
 \label{sec:FV}
@@ -169,7 +169,7 @@ Address \\
 			\end{equation}
 
 			\noindent
-			where $\alpha \in (0,1)$ is an element-wise power and $z \in R^n$ is arbitrary real vector. As mentioned in the introduction, the power-normalization has the effect of suppression of the descriptors that occur frequently in the image (bursty features), these can be for instance periodical structures such as skyscraper windows or bricks of the wall. In our setup we use $\alpha=0.5$ as it has been reported by Jegou et al. \cite{Jegou2012HAL} that this value is optimal for wide range of GMM components $N$.
+			where $\alpha \in (0,1)$ is an element-wise power and $z \in R^d$ is an arbitrary real vector. As mentioned in the introduction, the power-normalization has the effect of suppression of the descriptors that occur frequently in the image (bursty features), these can be for instance periodical structures such as skyscraper windows or bricks of the wall. In our setup we use $\alpha=0.5$ as it has been reported by Jegou et al. \cite{Jegou2012HAL} that this value is optimal for wide range of GMM components $N$.
 
 		\subsection{Dimension reduction}
 			The resulted Fisher vector is a high-dimensional representation of an image, which dimensionality depends only on number of $N$ components of the GMM and dimension $d$ of the local image descriptors which is fixed. In practice, the PCA is being used for decorrelation and projection to a lower dimensional space because it subsequently directly affects a size of the indexed signature (see Sec. \ref{sec:overview} and \cite{Jegou2011}).
@@ -179,44 +179,48 @@ Address \\
 			Finally, it is worth noting that PCA projection into a `not-too-low' dimensional space can actually slightly improve the performance of the full FV. What that `not-too-low' actually means have been partially discussed in \cite{Jegou2012HAL}. However, in general as the dimension decreases the performance of decorrelated FV decrease which is, indeed, what we observe in our experiments. In the next section we therefore aim on enhancing the performance of projected FVs.   
 
 
-\section{Per-location classifiers and Fischer vector embedding}
-\label{sec:perLoc}
-	In place recognition there are different definitions of what \emph{the place} means. The definition depends on the goal of the particular task. Should it be a pose of the camera or is it an ID of a building in the image? In our problem, \emph{the place} is defined as an associated GPS location of the database image that captures the same scene as does the query image. 
+\section{Per-exemplar SVM and Fischer vectors}
+\textcolor{myRed}{I have renamed this seciton and skipped per location classifiers at all.}
+\label{sec:perExemplar}
+	In place recognition there are different definitions of what \emph{the place} means. The definition depends on the goal of the particular task. Should it be a pose of the camera or is it an ID of a building in the image? In our problem, \emph{the place} is defined as an associated GPS location of the database image that captures the same scene as does the query image. Hence, given the unknown query image, the goal is to find a database image depicting the same scene and retrieve its GPS location.
 
-	Each database image $j$ is represented by its Fisher vector $\Phi_j$. The goal is to learn a set of functions $f_j$, one per each database image, such that at query time, given the Fisher vector $\Phi_q$ of an unknown query image, we can either retrieve the the correct database image as the image $j^*$ with the highest score
+	Each database image $j$ is represented by its Fisher vector $\Phi_j$. The goal is to learn a set of new vectors $\Psi_j$, one per each database image, such that at query time, given the Fisher vector $\Phi_q$ of an unknown query image, we can either retrieve the the correct database image as the image $j^*$ with the highest score
 
-   \begin{equation}
+	\begin{equation}
 	   \label{eq:class}
-	    j^*=\operatorname*{arg\;max}_{j} f_j(\Phi_q) 
-   \end{equation}
+	    j^*=\operatorname*{arg\;max}_{j} \Phi_q^T \Psi_j 
+	\end{equation}
 
-   \noindent
-    or use these scores to rank candidate images and use geometric verification to try and identify the correct location in an $n$-best list. Rather then tackle the problem as multi class learning we follow the approach of \cite{Malisiewicz11} and \cite{Gronat2013} and we learn $f_j$ independently for each image in turn. We aim on replacing the original database Fisher vector $\Phi$ with some new vector $w_j$ that performs better. Hence, the function $f_j$ from eq. \eqref{eq:class} can be defined as linear function
+	or use these scores to rank candidate images and use geometric verification to try and identify the correct location in an $n$-best list. Rather then tackle the problem as multi class learning we follow the approach of \cite{Malisiewicz11} and \cite{Gronat2013} and we learn $\Psi_j$ independently for each image in turn using per-exemplar SVM. We aim on replacing the original database Fisher vector $\Phi$ with some new vector $\Psi$ that performs better in sense of separation from hard negative examples and that has unit $L2$-norm in order to measure the similarity by a dot-product (eq. \eqref{eq:class}).
 
-    \begin{equation}
-    	f_j(\Phi_q)=\dfrac{w_j^T}{\norm{w_j}}\cdot \Phi_q
-    	\label{eq:linreg}
-    \end{equation}
-    .
 
-    \subsection{Learning SVMs}
+	To achieve the goal we will use relaxed form per-exemplar SVM formulation. The SVM convex objective can be formulated as follows
 
-    	 Our goal is to learn a linear regressor $w_j$ by using SVM which convex objective can be formulated as follows
+	\begin{align}
+        \operatorname*{arg\;min}_{w_j, b_j}
+        ||w_j||^{2}& +C_1 \cdot h(w_j^T\Phi^+_j+b_j)
+                         +C_2\sum_{\Phi\in \mathcal N_j}h(-w_j^T\Phi-b_j) 	
+       	\label{eq:obj} 
+  	\end{align}
+  	where $\Phi^+_j$ is a single positive exemplar, $\Phi$ are FVs from negative training data, $||w_j||$ is a regularization term, $h$ is a penalty function and $C_1$, $C_2$ are penalty weights for positive or negative data $\mathcal N_j$. 
 
-    	\begin{align}
-	        \Omega(w_j,b_j)=||w_j||^{2}& +C_1\sum_{\Phi\in \mathcal P_j}h(w_j^T\Phi+b_j)
-	                         +C_2\sum_{\Phi\in \mathcal N_j}h(-w_j^T\Phi-b_j)
-	       	\label{eq:obj} 
-      	\end{align}
+  	Clearly, the $w_j$ can be of an arbitrary norm  which depends on penalty parameters $C_1,\;C_2$ and training data. To find the unit vector $\Psi$ we will relax the SVM problem in two steps: (i) We use SVM for ranking problem which is independent on $b_j$. (ii) Rather than normalizing $w_j$ by additional constraint in objective \eqref{eq:obj} we first solve the SVM and then re-normalize $w_j$. The resulting vector $\Psi$ can be then written as
+	  	\begin{equation}
+	  		\Psi_j=\dfrac{w_j}{||w_j||}
+	  	\end{equation}
 
-      	where $\Phi$ are FVs from training data, $\norm{w_j}$ is a regularization term, $h$ is a penalty function and $C_1$, $C_2$ are penalty weights for positive $\mathcal P_j$ or negative $\mathcal N_j$ data. Let us first explain what are the training data and later analyze behavior of the formulation \eqref{eq:obj}.
+  	The vector $\Psi_j$ can be interpreted as a direction that separates the training thata in an optimal way.
+
+
     \subsection{Training data}
-      	The negative training data set $\mathcal N_j$ contains hard negative examples of the image $j$. These hard negatives are database images that are spatially far-away from image $j$ and, at the same time, have a high similarity score with image $j$ measured by a dot-product of its FVs. This approach follows the simple idea of \cite{Knopp2010} that far-away images do not share the same visual content. A GPS information associated with each database image allows us to construct such a negative set for each image $j$ in turn. Details are provided in experimental section \ref{sec:exp}.
+      	The negative training data set contains hard negative examples of the image $j$. These hard negatives are database images that are spatially far-away from image $j$ and, at the same time, have a high similarity score with image $j$ measured by a dot-product of its FVs. This approach follows the simple idea of \cite{Knopp2010} that far-away images do not share the same visual content. A GPS information associated with each database image allows us to construct such a negative set for each image $j$ in turn. Details are provided in experimental section \ref{sec:exp}.
 
-      	The positive training data set $\mathcal P_j$ is represented by the only image $j$ itself. Why is that? It comes from the nature of the dataset. One could find additional positive examples by taking adjacent panorama images and building a graph where each node represents an image and each edge represents a visual overlap. However, due to the panorama sampling density during the capturing process of the Google Street View it is very rare to detect a visual overlap between two adjacent panoramas. Instead, very often the detected visual overlap is between the images that come from the same panorama and differ by a homography. We found that there is no benefit from taking these images into account.
+      	The positive training data set is represented by the only image $j$ itself. Why is that? It comes from the nature of the dataset. One could find additional positive examples by taking adjacent panorama images and building a graph where each node represents an image and each edge represents a visual overlap. However, due to the panorama sampling density during the capturing process of the Google Street View it is very rare to detect a visual overlap between two adjacent panoramas. Instead, very often the detected visual overlap is between the images that come from the same panorama and differ by a homography. We found that there is no benefit from taking these images into account.
 
 \section{Why does exemplar-svm works}
-  	The convex objective \eqref{eq:obj} consist of regularization term a two penalty terms with weights $C_1$ and $C_2$. Lets assume for the moment that the weight of the negative data penalty $C_2 \rightarrow 0$. Then the regularization term and the first penalty term dominates the equation \eqref{eq:obj}. Since $\mathcal P_j$ contain only a single positive training data, the sum from eq. \eqref{eq:obj} becomes
+  	The convex objective \eqref{eq:obj} consist of regularization term a two penalty terms with weights $C_1$ and $C_2$. We will show that if $C_2 \rightarrow 0$ the $\Psi_j \rightarrow \Phi^+_j$.
+
+  	Lets assume for the moment that the weight of the negative data penalty $C_2 \rightarrow 0$. Then the regularization term and the first penalty term dominates the equation \eqref{eq:obj}. Since $\mathcal P_j$ contain only a single positive training data, the sum from eq. \eqref{eq:obj} becomes
 
   	\begin{equation}
   		C_1\sum_{\Phi\in \mathcal P_j}h(w_j^T\Phi+b_j)=C_1 \cdot h(w_j^T\Phi^++b_j)
