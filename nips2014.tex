@@ -17,7 +17,7 @@
 %\documentstyle[nips14submit_09,times,art10]{article} % For LaTeX 2.09
 
 
-\title{Fisher vector places: Learning compact place specific descriptors}
+\title{Fisher vector places: \\ learning compact place specific descriptors}
 
 
 \author{
@@ -93,21 +93,66 @@ Address \\
 % ******************************************************
 
 \begin{abstract}
-	The aim of this work is to localize a query photograph by finding other images depicting the same place in a large geotagged image database. The contribution of this paper is as follows. We represent each database image by a Fisher vector and for each vector we learn per-location SVM classifiers. We show that trained and re-normalized SVM weight can be used as an embedded descriptor that replaces original Fisher vector. Though the SVMs were learned independently no further calibration is necessary. We perform two experiments on state-of-the-art datasets for place recognition and we show that our method consistently improves the results for different dimensions of decorrelated Fischer vectors.
+%	The aim of this work is to localize a query photograph by finding other images depicting the same place in a large geotagged image database. 
+%	The contributions are threefold: First, we represent each database image by a Fisher vector and for each vector we learn per-location SVM classifiers. We show that trained and re-normalized SVM weight can be used as an embedded descriptor that replaces original Fisher vector. Though the SVMs were learned independently no further calibration is necessary. We perform two experiments on state-of-the-art datasets for place recognition and we show that our method consistently improves the results for different dimensions of decorrelated Fischer vectors.
+		
+Exemplar support vector machines (e-SVM) are emerging as a powerful tool to learn a discriminative pre-example representation for
+visual recognition. However, as individual classifiers are learnt independently for each positive example the classifier scores require careful and tedious calibration on an independent held-out data. 
+The contribution of this work are three fold.
+First, we analyze the e-SVM cost and show that the learnt hyperplane can be interpreted
+as a new descriptor that replaces the original positive example and is re-weighted to increase its distance from the negative data.
+Second, we demonstrate that after an appropriate normalization of the new re-weighted descriptor no further calibration is necessary. % of the learnt per-location E-SVMs is necessary.
+Third, we apply e-SVM training to compact Fisher vector descriptors for large-scale place recognition resulting in  
+a {\em discriminative} yet {\em compact} representation of each image in the database. 
+Place recognition results are shown on a dataset of 25k images of Pittsburgh and demonstrate the learnt representation
+consistently improves over the standard Fisher vector descriptors with different dimensions. 
 \end{abstract}
 
 \section{Introduction}
-	Internet contains a huge collection of imagery that grows  literally every second. For instance, in 2013 Facebook claimed \cite{imageGrow} that every single minute users upload about 208,300 new images, for Instagrama this number was about  27,800. This makes about 340,000,000 new images per day. Another interesting factor is that every minute users will upload more than 100 hours of video on Youtube. Considering the fact that most of the videos are in HD make these numbers even more impressive.
 
-	Imagine that there was a system that takes a picture from the imagery as an input and it shows you a position on the map indicating where the input image was captured. What would be this system useful for? One could take a picture from his smartphone and use it as an alternative to GPS or to precise localization in urban areas when the GPS was noisy. Surely, it would find its place in security and surveillance applications where one could localize an unknown image or video sequence based on its appearance. An alternative application would be a path reconstruction from a first-person-view or UAV video \c which was cheaper then state-of-the-art SLAM. Interesting may be a localization of scenes in old movies or collecting images from one place and observe how the place has changed over time.
+The exemplar support vector machine (e-SVM) has been used in a number of visual recognition tasks including
+category-level recognition~\cite{Malisiewicz11}, cross-domain retrieval~\cite{Shrivastava11}, scene parsing~\cite{Tighe13}, %image to 3D model alignment~\cite{Aubry13},
+place recognition~\cite{Gronat13} or as an initialization  for more complex discriminative clustering models~\cite{Doersch12,Singh12}. The main idea is to train a linear support vector machine (SVM) classifier from a single positive example and a large number of negatives. The intuition is that the resulting weight vector will give a higher weight to the discriminative dimensions of the positive training data point and will down weight dimensions that are non-discriminative with respect to the negative training data. A key advantage is that each per-exemplar classifier can be trained independently and hence the learning can be heavily parallelized. 
+The per-exemplar training brings however also an important drawback. As each classifier is trained independently a
+careful calibration of the resulting classifier scores on additional held out data is required~\cite{Gronat13,Malisiewicz11}. 
 
-	Indeed, many of these systems already exist \cite{Majdik2013, Torii2011} and have been intensively developed in last decade. In place recognition problems, researchers use many diverse techniques and aim for slightly different goals but the basic idea of the place recognition is the same; There is a structured collection of imagery where each image contains information about its location in the environment. This information can be for instance a GPS location or an image position in the semantic graph. Such a structured image collection is called a database. Given an unknown query image, the goal is to find the most similar image in the database and use its structural information for query localization, e.g. plot its GPS position on the map.
+Similar to~\cite{Gronat13}, in this work we apply exemplar SVM training to learn a location specific descriptor for large-scale place recognition in street-level image collections such as Google Street-view. This is a practically important set-up with applications in robotics, augmented reality or navigation.
+% Finding images depicting in the same place is a practially important set-up with applications    
+ The exemplar SVM is well suited for this task as street-level image collections typically contain only one or at most hand-full of images depicting the same place. The intuition is that the exemplar SVM can learn the important features that distinguish the particular place from other similar places  in the database.  While the results of~\cite{Gronat13} are promising they suffer from two important drawbacks. First, the learnt place specific representation is not compact, which prohibits its application to planet-scale street-level collections that are now becoming available~\cite{Klinger13}. Second, as discussed above the per-exemplar classifiers require careful and time-consuming calibration on held-out imagery.
 
-	The structured database may contain from few thousands to couple of millions of images.  To find a similar image in the database is therefore a challenging task. As an example, the query and database images may depict the same 3D object (e.g. building) from a different camera viewpoint, under different illumination conditions or the object can be partially occluded. In addition, the database can be very large. For instance, we estimate that Google Street View of France contains more than 60 million panoramic images. Therefore, we want to represent the images by descriptors that are robust to viewpoint changes, occlusion, illumination conditions and at the same time these descriptors must be low dimensional (or very sparse) in order to perform efficient and cheap retrieval in a large database.
+In this work we address both these issues. 
+First, we apply the exemplar SVM training to compact Fisher vector~\cite{Jegou2011,Perronnin2010} image descriptors, which results in a compact yet discriminative representation of each image in the database.  
+Second, to avoid the expensive classifier calibration we analyze the exemplar SVM cost and show that the learnt hyperplane can be interpreted
+as a new descriptor that replaces the original positive example and is re-weighted to increase its distance from the negative data.
+As a result of this analysis, we demonstrate that after an appropriate normalization of the new re-weighted descriptor no further calibration is necessary.
+
+We show improved results on place recognition using learnt compact Fisher vector descriptors of different dimensionality without the need for additional calibration.  
+The same procedure be potentially applied to other descriptors such as HOG~\cite{Dalal05} or the recently developed convolutional neural network features~\cite{Donahue13,Krizhevsky12,Oquab14,Sermanet13}.      
+
+
+
+%	Internet contains a huge collection of imagery that grows  literally every second. For instance, in 2013 Facebook claimed \cite{imageGrow} that every single minute users upload about 208,300 new images, for Instagrama this number was about  27,800. This makes about 340,000,000 new images per day. Another interesting factor is that every minute users will upload more than 100 hours of video on Youtube. Considering the fact that most of the videos are in HD make these numbers even more impressive.
+%
+%	Imagine that there was a system that takes a picture from the imagery as an input and it shows you a position on the map indicating where the input image was captured. What would be this system useful for? One could take a picture from his smartphone and use it as an alternative to GPS or to precise localization in urban areas when the GPS was noisy. Surely, it would find its place in security and surveillance applications where one could localize an unknown image or video sequence based on its appearance. An alternative application would be a path reconstruction from a first-person-view or UAV video \c which was cheaper then state-of-the-art SLAM. Interesting may be a localization of scenes in old movies or collecting images from one place and observe how the place has changed over time.
+%
+%	Indeed, many of these systems already exist \cite{Majdik2013, Torii2011} and have been intensively developed in last decade. In place recognition problems, researchers use many diverse techniques and aim for slightly different goals but the basic idea of the place recognition is the same; There is a structured collection of imagery where each image contains information about its location in the environment. This information can be for instance a GPS location or an image position in the semantic graph. Such a structured image collection is called a database. Given an unknown query image, the goal is to find the most similar image in the database and use its structural information for query localization, e.g. plot its GPS position on the map.
+%
+%	The structured database may contain from few thousands to couple of millions of images.  To find a similar image in the database is therefore a challenging task. As an example, the query and database images may depict the same 3D object (e.g. building) from a different camera viewpoint, under different illumination conditions or the object can be partially occluded. In addition, the database can be very large. For instance, we estimate that Google Street View of France contains more than 60 million panoramic images. Therefore, we want to represent the images by descriptors that are robust to viewpoint changes, occlusion, illumination conditions and at the same time these descriptors must be low dimensional (or very sparse) in order to perform efficient and cheap retrieval in a large database.
 
 
 \section{Related work} 
-\label{sec:overview}
+\label{sec:related}
+
+\paragraph{Learning discriminative projections for Fisher vectors.}
+Usually global and different tasks (faces, ...).
+
+
+\paragraph{Large-scale place recognition.}
+- Typically using BoVW.
+- FV has been used by Torii13, but without learning.
+
+
+\paragraph{Related work by P.G. }
 	Unlike the other work in large scale place recognition~\cite{Gronat2013,Cummins09,Knopp2010,Schindler07} and image retrieval~\cite{Nister06,Philbin07,Sivic2003}, we do not build on the bag-of-visual-words representation~\cite{Csurka04,Sivic2003}. Instead, we use Fisher vectors (FV) \cite{Jegou2011} that are recently finding its place in image retrieval, place recognition \cite{Torii2013} and other computer vision tasks \cite{Simonyan2013, Krapac2011}. These high-dimensional image representations are well-suited for retrieval problems since they are very robust to view-point changes and are more discriminative than standard bag-of-visual-words (BOW). However, the main drawback of FV is that unlike BOW it is dense which makes it nearly unfeasible for usage because of the memory footprint and computational cost.
 
  	For the above-mentioned reasons researchers aim on FV optimization. As an example, a nice paper of Perronnin et al. \cite{Perronnin2010} focuses on analysis and compression of FV for image retrieval. They explain how the FV is related to BOW and underline that power-normalization of FV is equivalent to a burstiness features suppression \cite{Jegou2009}. They benefit from the fact that as the power~$\alpha$ goes to zero the {$\alpha$-normalized} Fisher vector converges to a ternary representation which can be efficiently binarized. They compared their method with the Local Sensitive Hashing (LSH) and the Spectral Hashing (SH) and showed comparable results while achieving only 520~bits signature per image. This encouraging result have been outperformed by Jegou et al. \cite{Jegou2011} who achieved comparable results with just 128~bits signature by using product quantizers (PQ). Hence, the Fisher vectors can be significantly compressed by appropriate indexing. In general, these results have been achieved by optimizing:
