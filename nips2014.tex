@@ -394,17 +394,17 @@ The same procedure be potentially applied to other descriptors such as HOG~\cite
 				        \centering
                         \includegraphics[width=0.35\linewidth]{imgs/figSVM01tight}
 				    }
-                    \hspace{20mm}
+                    $C_2 \rightarrow 0$
 				    \subfigure[]{
 				        \centering
                         \includegraphics[width=0.35\linewidth]{imgs/figSVM02tight}
 				    }
-			    \caption{An illustration of the effect of decreasing a parameter $C_2$. As the paramterer $C_2$ is decreased the resulting vector $w_j$ is being parallel to $\Phi_j^+$.}
+			    \caption{An illustration of the effect of decreasing a parameter $C_2$. As the paramterer $C_2$ decreases the resulting vector $w_j$ is being parallel to $\Phi_j^+$. Re-normalized $w_j$ is then identical with original positive vector.}
 			    \label{fig:C2effect}
                 \end{center}
 			\end{figure}
 
-		As a conclusion, we have shown that when $C_2$ is close to zero the hyperplane $w_j$ is parallel to original $\Phi^+$, when $C_2$ increases $w_j$ declines from direciton of $\Phi^+$.
+		As a conclusion, we have shown that when $C_2$ is close to zero the hyperplane $w_j$ is parallel to original $\Phi^+$, when $C_2$ increases $w_j$ declines from direciton of $\Phi^+$. 
 
 	\subsection*{Interpretation, re-normalization} \vspace{-0.2cm}
 	  	The result above shows that as $C_2$ decreases the normal of the hyperplane that separates the positive exemplar from negative data tends to be parallel with $\Phi^+$ as shown in figure \ref{fig:C2effect}. As $C_2$ grows, this normal declines such that distance from the negative data increases.
@@ -452,18 +452,27 @@ The same procedure be potentially applied to other descriptors such as HOG~\cite
 
 \section{Experimental evaluation}
 \label{sec:exp}
-	\textcolor{myRed}{(TODO: Show calibrated BOW, why we are not showing calibrated FV, argue for it. Emphasize that the goal was achieved. Highlight its benefits!)}
 	In this section we first describe the experimental datasets, then we give implementation details and finally compare performance of the proposed approach on two datasets with several baseline methods.
 
 	%%%%%%%%%%%%%%%%%%%%%%%%%%
    	\subsection{Image datasets}
    	%%%%%%%%%%%%%%%%%%%%%%%%%%
-   		\textcolor{myRed}{(Another image retrieval datasets? INRIA Holliday, Sun, etc., it could be doable, but we have to find a FV competitor)}\newline
 		We performed our experiments on a database of Google Street View images from the Internet. For evaluation we have used two datasets. The first one is identical to \cite{Gronat2013, Torii2011} ($25k$ of images), the latter one is an extension extension of this dataset to achieve a higher spatial density ($55k$ of images).
 
 		We downloaded panoramas from Pittsburgh (U.S.) covering roughly an area of $1.3 \times 1.2 \; {\rm km}^2$. Similar to~\cite{Chen11}, for each panorama we generate 12 overlapping perspective views corresponding to two different elevation angles to capture both the street-level scene and the building fa\c{c}ades, resulting in a total of 24 perspective views each with $90^\circ$ FOV and resolution of $960 \times 720$ pixels.
 
 		As a query set with known ground truth GPS positions, we use the 8999 panoramas from the Google Street View research dataset, which cover approximately the same area, but were captured at a different time, and typically depict the same places from different viewpoints and under different illumination conditions. For each test panorama, we generate perspective images as described above. Finally, we randomly select out of all generated perspective views a subset of 4k images, which is used as a test set to evaluate the performance of the proposed approach.
+
+
+
+\begin{figure}[t!]
+    \centering
+    \includegraphics[width=\linewidth]{imgs/plotPitt25k}    
+    \caption{
+        \textbf{Evaluation on Pittsburgh 25k \cite{Gronat13} dataset.} The fraction of correctly recognized queries (recall@K, y-axis) vs. the number of topK retrieved datbase images for different FV dimensions. Proposed method (e-SVM) consistently improves the results over all dimensions.
+    }
+    \label{fig:recall}
+\end{figure}
 
 	%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
    \subsection{Implementation details}
@@ -496,23 +505,14 @@ The same procedure be potentially applied to other descriptors such as HOG~\cite
 		\vspace{-4mm}
 		\paragraph{Ground truth:}
 			Since all the query images have associated GPS location we can compute the spatial distance from database image. We consider query image to be correctly localized if its retrieved database image lies within a perimeter of $20m$ from the query image.
-	
+
+
 	\subsection{Results}
 		For each database we compare our results to two baselines: a standard BOW baseline and a Fisher vector baseline. We measure our performance by recall@K metric which is the portion of query images that have at least one relevant image inside its ranked shortlist of the length $K$. We perform our experiments on several target FV dimensions as shown in the figure \ref{fig:recall}.
 
-		\begin{figure}
-		\centering
-		\includegraphics[width=\linewidth]{evaluationWOWplot}	
-		\caption{
-			\textcolor{myRed}{Fake results, actually SF, no embedded FV curves}
-			Recall curves for different methods
-		}
-		\label{fig:recall}
-		\end{figure}
-
 		It is noticeable that proposed method outperforms all baselines and consistently improves the performance of the original FV over all lengths $K$ of the shortlist and all target FV dimensions. This particularly means that learned descriptors are more likely to attract relevant images into top$K$ shortlist. The results are summarized in table \ref{tab:recall}.
 
-\begin{table}
+\begin{table}[t!]
 \begin{centering}
 	\begin{tabularx}{0.94\linewidth}{|c|c c c c c|c c c c c|}
 		\hline 
@@ -544,11 +544,11 @@ The same procedure be potentially applied to other descriptors such as HOG~\cite
 		\textbf{FV2048 e-SVM}  & \textbf{50.2} & \textbf{57.3} & \textbf{67.0} & \textbf{73.8} & \textbf{78.0} &
         \textbf{20.8} & \textbf{25.9} & \textbf{33.1} & \textbf{38.7} & \textbf{45.9}\\
         \hline
-        \rowcolor{maroon!10}
-        FV8192        & 46.0  & 52.7 & 62.5 & 69.4 & 76.4 & - & - & - & - &  -   \\
-        \rowcolor{maroon!10}
-        \textbf{FV8192 e-SVM}  & \textbf{48.4} & \textbf{55.6} & \textbf{65.4} & \textbf{72.6} & \textbf{79.0} & - & - & - & - & -\\
-		\hline
+  %       \rowcolor{maroon!10}
+  %       FV8192        & 46.0  & 52.7 & 62.5 & 69.4 & 76.4 & - & - & - & - &  -   \\
+  %       \rowcolor{maroon!10}
+  %       \textbf{FV8192 e-SVM}  & \textbf{48.4} & \textbf{55.6} & \textbf{65.4} & \textbf{72.6} & \textbf{79.0} & - & - & - & - & -\\
+		% \hline
 	\end{tabularx}
 	\caption{ \textcolor{myRed}{}
 		The percentage of correctly localized test queries for which the topK ranked database image is within $20$ meters from the ground truth query position. The proposed method (svmFV) outperforms the baseline methods.
