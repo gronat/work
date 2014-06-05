@@ -7,45 +7,45 @@ Database file #2: vggroup.bib
 Database file #3: cvww_template.bib
 Database file #4: mybib.bib
 Warning--I didn't find a database entry for "vlfeat"
-You've used 34 entries,
+You've used 39 entries,
             2946 wiz_defined-function locations,
-            1090 strings with 14020 characters,
-and the built_in function-call counts, 22764 in all, are:
-= -- 2303
-> -- 703
+            1106 strings with 14528 characters,
+and the built_in function-call counts, 25443 in all, are:
+= -- 2523
+> -- 818
 < -- 7
-+ -- 362
-- -- 254
-* -- 1108
-:= -- 2556
-add.period$ -- 53
-call.type$ -- 34
-change.case$ -- 284
++ -- 414
+- -- 296
+* -- 1257
+:= -- 2905
+add.period$ -- 59
+call.type$ -- 39
+change.case$ -- 328
 chr.to.int$ -- 0
-cite$ -- 34
-duplicate$ -- 2369
-empty$ -- 1654
-format.name$ -- 287
-if$ -- 4781
+cite$ -- 39
+duplicate$ -- 2629
+empty$ -- 1870
+format.name$ -- 334
+if$ -- 5330
 int.to.chr$ -- 0
-int.to.str$ -- 34
-missing$ -- 356
-newline$ -- 157
-num.names$ -- 68
-pop$ -- 1031
+int.to.str$ -- 39
+missing$ -- 409
+newline$ -- 178
+num.names$ -- 78
+pop$ -- 1168
 preamble$ -- 1
-purify$ -- 195
+purify$ -- 226
 quote$ -- 0
-skip$ -- 1061
+skip$ -- 1138
 stack$ -- 0
-substring$ -- 763
-swap$ -- 1672
+substring$ -- 815
+swap$ -- 1821
 text.length$ -- 7
 text.prefix$ -- 0
 top$ -- 0
-type$ -- 136
+type$ -- 156
 warning$ -- 0
-while$ -- 101
-width$ -- 36
-write$ -- 357
+while$ -- 113
+width$ -- 41
+write$ -- 405
 (There was 1 warning)

@@ -6,10 +6,20 @@
   \providecommand{\doi}{DOI~\discretionary{}{}{}\begingroup
   \urlstyle{rm}\Url}\fi
 
+\bibitem{Agarwal-ICCV-2009}
+Agarwal, S., Snavely, N., Simon, I., Seitz, S., Szeliski, R.: Building {Rome}
+  in a day.
+\newblock In: ICCV, pp. 72--79 (2009)
+
 \bibitem{Arandjelovic12}
 Arandjelovi\'c, R., Zisserman, A.: Three things everyone should know to improve
   object retrieval.
 \newblock In: IEEE PAMI (2012)
+
+\bibitem{Chatfield11}
+Chatfield, K., Lempitsky, V., Vedaldi, A., Zisserman, A.: The devil is in the
+  details: an evaluation of recent feature encoding methods.
+\newblock In: Proc. BMVC (2011)
 
 \bibitem{Chen11}
 Chen, D., Baatz, G., K{\"o}ser, Tsai, S., Vedantham, R., Pylvanainen, T.,
@@ -60,10 +70,6 @@ Gronat, P., Obozinski, G., Sivic, J., Pajdla, T.: Learning and calibrating
 \newblock
   \urlprefix\url{http://dblp.uni-trier.de/db/conf/cvpr/cvpr2013.html#GronatOSP13}
 
-\bibitem{Jegou2009}
-Jegou, H., Douze, M., Schmid, C.: On the burstiness of visual elements.
-\newblock In: CVPR, pp. 1169--1176 (2009)
-
 \bibitem{Jegou2011}
 J{\'e}gou, H., Douze, M., Schmid, C.: {Product Quantization for Nearest
   Neighbor Search}.
@@ -79,6 +85,11 @@ J{\'e}gou, H., Douze, M., Schmid, C., P{\'e}rez, P.: {Aggregating local
   States (2010).
 \newblock \doi{10.1109/CVPR.2010.5540039}.
 \newblock \urlprefix\url{http://hal.inria.fr/inria-00548637}
+
+\bibitem{Jegou12}
+J{\'e}gou, H., Perronnin, F., Douze, M., S{\'a}nchez, J., P{\'e}rez, P.,
+  Schmid, C.: Aggregating local image descriptors into compact codes.
+\newblock IEEE PAMI \textbf{34}, 1704--1716 (2012)
 
 \bibitem{Jegou2012HAL}
 J{\'e}gou, H., Perronnin, F., Douze, M., S{\'a}nchez, J., P{\'e}rez, P.,
@@ -112,6 +123,11 @@ Krizhevsky, A., Sutskever, I., Hinton, G.E.: Imagenet classification with deep
   convolutional neural networks.
 \newblock In: NIPS (2012)
 
+\bibitem{Li12}
+Li, Y., Snavely, N., Huttenlocher, D., Fua, P.: Worldwide pose estimation using
+  3d point clouds.
+\newblock In: ECCV (2012)
+
 \bibitem{Lowe04}
 Lowe, D.: Distinctive image features from scale-invariant keypoints.
 \newblock IJCV \textbf{60}(2), 91--110 (2004)
@@ -120,10 +136,6 @@ Lowe, D.: Distinctive image features from scale-invariant keypoints.
 Malisiewicz, T., Gupta, A., Efros, A.A.: Ensemble of exemplar-svms for object
   detection and beyond.
 \newblock In: ICCV (2011)
-
-\bibitem{Nister06}
-Nister, D., Stewenius, H.: Scalable recognition with a vocabulary tree.
-\newblock In: CVPR (2006)
 
 \bibitem{Oquab14}
 Oquab, M., Bottou, L., Laptev, I., Sivic, J.: Learning and transferring
@@ -146,6 +158,11 @@ Perronnin, F., Liu, Y., Sánchez, J., Poirier, H.: Large-scale image retrieval
 Philbin, J., Chum, O., Isard, M., Sivic, J., Zisserman, A.: Object retrieval
   with large vocabularies and fast spatial matching.
 \newblock In: CVPR (2007)
+
+\bibitem{Sattler12}
+Sattler, T., Leibe, B., Kobbelt, L.: Improving image-based localization by
+  active correspondence search.
+\newblock In: ECCV (2012)
 
 \bibitem{Schindler07}
 Schindler, G., Brown, M., Szeliski, R.: City-scale location recognition.
@@ -172,6 +189,12 @@ Singh, S., Gupta, A., Efros, A.A.: Unsupervised discovery of mid-level
   discriminative patches.
 \newblock In: ECCV (2012)
 
+\bibitem{Sivic03}
+Sivic, J., Zisserman, A.: {Video Google}: {A} text retrieval approach to object
+  matching in videos.
+\newblock In: ICCV (2003).
+\newblock \urlprefix\url{http://www.robots.ox.ac.uk/~vgg}
+
 \bibitem{Sivic2003}
 Sivic, J., Zisserman, A.: {Video Google}: {A} text retrieval approach to object
   matching in videos.
@@ -194,5 +217,10 @@ Torii, A., Sivic, J., Pajdla, T.: Visual localization by linear combination of
 Torii, A., Sivic, J., Pajdla, T., Okutomi, M.: Visual place recognition with
   repetitive structures.
 \newblock In: CVPR (2013)
+
+\bibitem{Zamir10}
+Zamir, A., Shah, M.: Accurate image localization based on google maps street
+  view.
+\newblock In: ECCV (2010)
 
 \end{thebibliography}
