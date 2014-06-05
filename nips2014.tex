@@ -309,20 +309,20 @@ The same procedure be potentially applied to other descriptors such as HOG~\cite
 \section{Learning compact place descriptors using per-exemplar SVM}
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 \label{sec:perExemplar}
-	Each database image $j$ is represented by its Fisher vector $\Phi_j$. The goal is to learn a set of new vectors $\Psi_j$, one per each database image, such that at query time, given the Fisher vector $\Phi_q$ of an unknown query image, we can retrieve the the correct database image as the image $j^*$ with the highest score
-
+	Each database image $j$ is represented by its L2-normalized Fisher vector $\Phi_j$. The goal is to learn a set of new L2-normalized Fisher vectors $\Psi_j$, one per each database image, such that at query time, given the Fisher vector $\Phi_q$ of an unknown query image, we retrieve the database image depicting the same location by finding the image $j^*$ with the highest score measured by a dot product
 	\begin{equation}
-	    j^*=\operatorname*{arg\;max}_{j} \Phi_q^T \Psi_j 
+	    j^*=\operatorname*{arg\;max}_{j} \Phi_q^T \Psi_j. 
 	    \label{eq:class}
 	\end{equation}
-
-	Hence, we aim on replacing the original database Fisher vector $\Phi_j$ with some new vector $\Psi_j$ that performs better in sense of separation from descriptors of other images depicting different places. The vector should have a unit $L2$-norm in order to measure the distance by a dot-product in equation \eqref{eq:class}. In the following we analyze a limit behavior of per-exemplar SVM convex objective and show that learned hyperplane normal can be interpreted as a new descriptor that increases the measured distance from negative data.
-
-
-	\subsection*{Per-exemplar SVM learning}\vspace{-0.2cm}
-        Per-exemplar SVM relies on a large number of negative data and only single or very few positive examples. This setup is well suited for place recognition since tipically only one positive training data is available. We follow the approach of \cite{Gronat2013} and we use per-exemplar SVM to learn a new descriptor $\Psi_j$ independently for each image in turn. The objective of per-exemplar SVM that can be written as 
-
-		\begin{equation}
+%	Note that both the query and database vectors are L2 normalized and hence the dot product measures the cosine of   
+	In other words, the aim is to replace each original database Fisher vector $\Phi_j$ with a new vector $\Psi_j$ that is more discriminative in the sense of separation from descriptors of images depicting other places. 
+	Inspired by~\cite{Gronat2013} we investigate applying the exemplar support vector machine (e-SVM)~\cite{} for this task. 
+	e-SVM learns a linear classifier $w_j^T\Phi+b_j$ given the descriptor of place $j$ as a single positive example $\Phi_j^+$ and a large number of negative data $\mathcal N_j$ from other places in the database.
+	The intuition is that the resulting weight $w_j$ vector will give a higher weight to the dimensions of the descriptor that are discriminative and will down-weight dimensions that are non-discriminative with respect to the negative training data collected from other far-away places.  The optimal $w_j$ and $b_j$ are obtained
+	by minimizing the following convex objective  
+%	The vector should have a unit $L2$-norm in order to measure the distance by a dot-product in equation \eqref{eq:class}. 
+%	In the following we analyze a limit behavior of per-exemplar SVM convex objective and show that learned hyperplane normal can be interpreted as a new descriptor that increases the measured distance from negative data.
+\begin{equation}
 	        ||w_j||^{2} +C_1 \cdot h
 	        				\left(
 	        				w_j^T\Phi^+_j+b_j
@@ -330,15 +330,45 @@ The same procedure be potentially applied to other descriptors such as HOG~\cite
 	                         +C_2\sum_{\Phi\in \mathcal N_j}h
 	                         \left(
 	                         -w_j^T\Phi-b_j
-	                         \right) 	
+	                         \right), 	
 	       	\label{eq:obj} 
 	  	\end{equation}
+	  	where $\Phi^+_j$ is the descriptor of the place $j$ as a the positive data point, $\Phi$ are Fisher descriptors from negative training data $\mathcal N_j$ and $h$ is the hinge loss. Note that the first term $||w_j||$ is the regularizer, the second term is the loss on the positive data weighted by scalar parameter $C_1$ and the third term is the loss on the negative data weighted by scalar parameter $C_2$. The optimal parameters $w_j$ and $b_j$ can be obtained using standard software packages such as~\cite{libsvm}. A key advantage is that the per-exemplar classifier for each place can be trained independently and hence the learning can be heavily parallelized. On the downside, as the individual per-location classifiers are trained independently the resulting scores have to be calibrated with respect to each other on additional data~\cite{Gronat13,Malisiewicz11}.
 
-	  	where $\Phi^+_j$ is a single positive exemplar, $\Phi$ are FVs from negative training data $\mathcal N_j$, $||w_j||$ is a regularization term, $h$ is a penalty function and $C_1$, $C_2$ are penalty weights for positive or negative data. This objective is being minimized in $w_j$ and $b_j$. In the section below will show that the new descriptor $\Psi_j$ can be interpreted as unit normal of the learned hyperplane $w_j$ and we will show that when $C_2$ in equation~(\ref{eq:obj}) goes to zero the new descriptor $\Psi_j$ is going to be identical to original $\Phi_j^+$, as $C_2$ increases $\Psi_j$ declines from $\Phi_j^+$ such that the measured distance between $\Psi_j$ and negative examples increases.
+In the following section, we analyze the exemplar SVM objective~(\ref{eq:obj}) and show the learnt weight vector $w_j$ can be interpreted as 
+a new descriptor $\Psi_j$.  In particular, when the weight $C_2$ of the negative data in objective~(\ref{eq:obj}) goes to zero the $\Psi_j$ is going to be identical to original $\Phi_j^+$.  As $C_2$ increases $\Psi_j$ goes away from $\Phi_j^+$ such that the measured distance between $\Psi_j$ and negative examples increases.
+Details are given next.
+
+% for c2->0, w_j is parallel with Phi+
+% for c2>0 the direction of  w_j changes such as the dot-product is maximied
+% this permits an intuitive intepretation of w as a new descriptor.
+   		
+		
+%The per-exemplar training brings however also an important drawback. As each classifier is trained independently a
+%careful calibration of the resulting classifier scores on additional held out data is required~\cite{Gronat13,Malisiewicz11}. 
+
+		
+%%		 $h$ is the hinge loss, and $C_1$, $C_2$ are weights for the loss on the positive or negative data. This objective is being minimized in $w_j$ and $b_j$. 
+%		 In the section below will show that the new descriptor $\Psi_j$ can be interpreted as unit normal of the learned hyperplane $w_j$ and we will show that when $C_2$ in equation~(\ref{eq:obj}) goes to zero the new descriptor $\Psi_j$ is going to be identical to original $\Phi_j^+$, as $C_2$ increases $\Psi_j$ declines from $\Phi_j^+$ such that the measured distance between $\Psi_j$ and negative examples increases.
 	
+%	\subsection*{Per-exemplar SVM learning}\vspace{-0.2cm}
+%        Per-exemplar SVM relies on a large number of negative data and only single or very few positive examples. This setup is well suited for place recognition since tipically only one positive training data is available. We follow the approach of \cite{Gronat2013} and we use per-exemplar SVM to learn a new descriptor $\Psi_j$ independently for each image in turn. The objective of per-exemplar SVM that can be written as 
+%		\begin{equation}
+%	        ||w_j||^{2} +C_1 \cdot h
+%	        				\left(
+%	        				w_j^T\Phi^+_j+b_j
+%	        				\right)
+%	                         +C_2\sum_{\Phi\in \mathcal N_j}h
+%	                         \left(
+%	                         -w_j^T\Phi-b_j
+%	                         \right) 	
+%	       	\label{eq:obj} 
+%	  	\end{equation}
+%	  	where $\Phi^+_j$ is a single positive exemplar, $\Phi$ are FVs from negative training data $\mathcal N_j$, $||w_j||$ is a regularization term, $h$ is a penalty function and $C_1$, $C_2$ are penalty weights for positive or negative data. This objective is being minimized in $w_j$ and $b_j$. In the section below will show that the new descriptor $\Psi_j$ can be interpreted as unit normal of the learned hyperplane $w_j$ and we will show that when $C_2$ in equation~(\ref{eq:obj}) goes to zero the new descriptor $\Psi_j$ is going to be identical to original $\Phi_j^+$, as $C_2$ increases $\Psi_j$ declines from $\Phi_j^+$ such that the measured distance between $\Psi_j$ and negative examples increases.
+%	
 	
 	\subsection*{Analysis of per-exemplar SVM objective} \vspace{-0.2cm} 		
-		We will analyze beavior of the convex objetive \eqref{eq:obj} and show that in a limit case the vector $w_j$ is parallel to single positive data $\Phi_j^+$. First, let us decompose $w_j$ into parallel and orthogonal part w.r.t. $\Phi^+$ and then let $C_2\rightarrow 0$ and analyze the behavior of the convex objective. After decomposition of $w_j$ such that $w_j=w_j^{\perp}+w_j^{||}$ the convex objective can be re-written as follows
+		We will analyze behavior of the objective \eqref{eq:obj} and show that in a limit case the vector $w_j$ is parallel to single positive data $\Phi_j^+$. First, let us decompose $w_j$ into parallel and orthogonal part w.r.t. $\Phi^+$ and then let $C_2\rightarrow 0$ and analyze the behavior of the convex objective. After decomposition of $w_j$ such that $w_j=w_j^{\perp}+w_j^{||}$ the convex objective can be re-written as follows
 
 	  	\begin{align}
 	  		\nonumber
