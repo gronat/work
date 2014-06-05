@@ -255,11 +255,11 @@ Usually global and different tasks (faces, ...).
 	       	\label{eq:obj} 
 	  	\end{equation}
 
-	  	where $\Phi^+_j$ is a single positive exemplar, $\Phi$ are FVs from negative training data $\mathcal N_j$, $||w_j||$ is a regularization term, $h$ is a penalty function and $C_1$, $C_2$ are penalty weights for positive or negative data. In the section below will show that the new descriptor $\Psi_j$ can be interpreted as unit normal of the learned hyperplane $w_j$ and we will show that when $C_2$ in equation~(\ref{eq:obj}) goes to zero the new descriptor $\Psi_j$ is going to be identical to original $\Phi_j^+$, as $C_2$ increases $\Psi_j$ declines from $\Phi_j^+$ such that the measured distance between $\Psi_j$ and negative examples increases.
+	  	where $\Phi^+_j$ is a single positive exemplar, $\Phi$ are FVs from negative training data $\mathcal N_j$, $||w_j||$ is a regularization term, $h$ is a penalty function and $C_1$, $C_2$ are penalty weights for positive or negative data. This objective is being minimized in $w_j$ and $b_j$. In the section below will show that the new descriptor $\Psi_j$ can be interpreted as unit normal of the learned hyperplane $w_j$ and we will show that when $C_2$ in equation~(\ref{eq:obj}) goes to zero the new descriptor $\Psi_j$ is going to be identical to original $\Phi_j^+$, as $C_2$ increases $\Psi_j$ declines from $\Phi_j^+$ such that the measured distance between $\Psi_j$ and negative examples increases.
 	
 	
 	\subsection*{Analysis of per-exemplar SVM objective} \vspace{-0.2cm} 		
-		We will analyze the beavior of the objetive \eqref{eq:obj} which is being minimized in $w_j$ and $b_j$. First, let us decompose $w_j$ into parallel and orthogonal part w.r.t. $\Phi^+$ and then let $C_2\rightarrow 0$ and analyze the behavior of the convex objective. After decomposition of $w_j$ such that $w_j=w_j^{\perp}+w_j^{||}$ the convex objective can be re-written as follows
+		We will analyze beavior of the convex objetive \eqref{eq:obj} and show that in a limit case the vector $w_j$ is parallel to single positive data $\Phi_j^+$. First, let us decompose $w_j$ into parallel and orthogonal part w.r.t. $\Phi^+$ and then let $C_2\rightarrow 0$ and analyze the behavior of the convex objective. After decomposition of $w_j$ such that $w_j=w_j^{\perp}+w_j^{||}$ the convex objective can be re-written as follows
 
 	  	\begin{align}
 	  		\nonumber
@@ -323,20 +323,17 @@ Usually global and different tasks (faces, ...).
 			    \label{fig:C2effect}
 			\end{figure}
 
+		As a conclusion, we have shown that when $C_2$ is close to zero the hyperplane $w_j$ is parallel to original $\Phi^+$, when $C_2$ increases $w_j$ declines from direciton of $\Phi^+$.
 
+	\subsection*{Interpretation, re-normalization} \vspace{-0.2cm}
+	  	The result above shows that as $C_2$ decreases the normal of the hyperplane that separates the positive exemplar from negative data tends to be parallel with $\Phi^+$ as shown in figure \ref{fig:C2effect}. As $C_2$ grows, this normal declines such that distance from the negative data increases.
 
-	%	\textcolor{myRed}{Take home message}\newline
-	%	As a conclusion, we have shown that when $C_2$ is close to zero the new descriptor $\Psi_j$ is identical to original $\Phi^+$, when $C_2$ increases $\Psi_j$ declines from $\Phi^+$ such that the measured distance between $\Psi_j$ and negative examples increases.
-
-	\paragraph{Interpretation, re-normalization.}
-	%  	\textcolor{myRed}{Interpretation, re-normalization}
-	  	This result shows that as $C2$ decreases the normal of the hyperplane that separates the positive exemplar from negative data tends to be parallel with $\Phi^+$. As $C_2$ grows, this normal declines such that distance from the negative data increases as shown in figure \ref{fig:C2effect}.
-
-
-		Since the goal is to measure the similarity between two descriptors by an angle, equation \eqref{eq:class}, we interpret the new descriptor $\Psi_j$ as a normalized hypeplane normal such that
+		Since FVs are $L2$ normalized our goal is to measure the similarity between two descriptors by an angle, equation \eqref{eq:class}, hence we interpret the new descriptor $\Psi_j$ as a normalized hypeplane normal such that
 		  	\begin{equation}
 		  		\Psi_j=\dfrac{w_j}{||w_j||}
-		  	\end{equation}.
+		  	\end{equation}
+
+        Finally, this new descriptor $\Psi_j$ performs better outperforms the original FV $\Psi_j$ as shown later in section \ref{sec:exp}.
 
 
 
