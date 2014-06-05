@@ -1,14 +1,11 @@
 
-nips2014.aux
-
-nips2014.aux
-
-nips2014.aux
-
-nips2014.aux
-
-nips2014.log
+*.aux
+*.log
+*.pdg
+*.gz
 
 nips2014.pdf
 
-nips2014.synctex.gz
+nips2014.log
+
+nips2014.aux
