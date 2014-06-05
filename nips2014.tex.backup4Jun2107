@@ -224,129 +224,106 @@ Usually global and different tasks (faces, ...).
 			Finally, it is worth noting that PCA projection into a `not-too-low' dimensional space can actually slightly improve the performance of the full FV. What that `not-too-low' actually means have been partially discussed in \cite{Jegou2012HAL}. However, in general as the dimension decreases the performance of decorrelated FV decrease which is, indeed, what we observe in our experiments. In the next section we therefore aim on enhancing the performance of projected FVs.   
 
 
-%\section{Per-exemplar SVM and Fischer vectors}
-%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-\section{Learning compact place descriptors using per-exemplar SVM}
-%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\section{Per-exemplar SVM and Fischer vectors}
 \label{sec:perExemplar}
-	Each database image $j$ is represented by its Fisher vector $\Phi_j$. The goal is to learn a set of new vectors $\Psi_j$, one per each database image, such that at query time, given the Fisher vector $\Phi_q$ of an unknown query image, we can retrieve the the correct database image as the image $j^*$ with the highest score
+	In place recognition there are different definitions of what \emph{the place} means. The definition depends on the goal of the particular task. Should it be a pose of the camera or is it an ID of a building in the image? In our problem, \emph{the place} is defined as an associated GPS location of the database image that captures the same scene as does the query image. Hence, given the unknown query image, the goal is to find a database image depicting the same scene and retrieve its GPS location.
+
+	Each database image $j$ is represented by its Fisher vector $\Phi_j$. The goal is to learn a set of new vectors $\Psi_j$, one per each database image, such that at query time, given the Fisher vector $\Phi_q$ of an unknown query image, we can either retrieve the the correct database image as the image $j^*$ with the highest score
 
 	\begin{equation}
 	    j^*=\operatorname*{arg\;max}_{j} \Phi_q^T \Psi_j 
 	    \label{eq:class}
 	\end{equation}
 
-	Hence, we aim on replacing the original database Fisher vector $\Phi$ with some new vector $\Psi$ that performs better in the sense of separation from descriptors of other places and that has a unit $L2$-norm in order to measure the similarity by a dot-product (eq. \eqref{eq:class}).
+	or use these scores to rank candidate images and use geometric verification to try and identify the correct location in an $n$-best list. Hence, we aim on replacing the original database Fisher vector $\Phi$ with some new vector $\Psi$ that performs better in sense of separation from hard negative examples and that has unit $L2$-norm in order to measure the similarity by a dot-product (eq. \eqref{eq:class}).
 
 
-	\paragraph{Per-exemplar SVM learning.}  
-	 	We follow the approach of \cite{Gronat2013} and \cite{Malisiewicz11} and we learn $\Psi_j$ independently for each image in turn using per-exemplar SVM. In the following we analyze a limit behavior of per-exemplar SVM convex objective and show that learned hyperplane normal can be interpreted as a new descriptor that increases the measured distance from negative data.
+	\textcolor{myRed}{Summary: We follow Gronat et al. and use e-SVM, we analyze convex objective, we show that learn hyperplane can be interpreted as new desc that increases the distance from negative.}
+	\newline
+	Rather then tackle the problem as multi class learning we follow the approach of \cite{Gronat2013} and \cite{Malisiewicz11} and we learn $\Psi_j$ independently for each image in turn using per-exemplar SVM. We analyze a limit behavior of per-exemplar SVM convex objective and show that learned hyperplane normal can be interpreted as a new descriptor that increases the measured distance from negative data.
 
 
-		The objective of per-exemplar SVM that can be written as 
+	\textcolor{myRed}{e-SVM convex objective, decompose $w$, show inequality when negative penalty neglected}
+	\newline
+	The convex objective of per-exemplar SVM that can be written as follows
 
-		\begin{equation}
-	        ||w_j||^{2} +C_1 \cdot h
-	        				\left(
-	        				w_j^T\Phi^+_j+b_j
-	        				\right)
-	                         +C_2\sum_{\Phi\in \mathcal N_j}h
-	                         \left(
-	                         -w_j^T\Phi-b_j
-	                         \right) 	
-	       	\label{eq:obj} 
-	  	\end{equation}
-	  	where $\Phi^+_j$ is a single positive exemplar, $\Phi$ are FVs from negative training data, $||w_j||$ is a regularization term, $h$ is a penalty function and $C_1$, $C_2$ are penalty weights for positive or negative data $\mathcal N_j$. 
-	
-	
-	\paragraph{Analysis of per-exemplar SVM objective.}  
-		In the following will shown that when $C_2$ in equation~(\ref{eq:obj}) is close to zero the new descriptor $\Psi_j$ is identical to original $\Phi^+$, when $C_2$ increases $\Psi_j$ declines from $\Phi^+$ such that the measured distance between $\Psi_j$ and negative examples increases.
+	\begin{equation}
+        ||w_j||^{2} +C_1 \cdot h
+        				\left(
+        				w_j^T\Phi^+_j+b_j
+        				\right)
+                         +C_2\sum_{\Phi\in \mathcal N_j}h
+                         \left(
+                         -w_j^T\Phi-b_j
+                         \right) 	
+       	\label{eq:obj} 
+  	\end{equation}
+  	where $\Phi^+_j$ is a single positive exemplar, $\Phi$ are FVs from negative training data, $||w_j||$ is a regularization term, $h$ is a penalty function and $C_1$, $C_2$ are penalty weights for positive or negative data $\mathcal N_j$. This objective is being minimized in $w_j$ and $b_j$. First, let us decompose $w_j$ into parallel and orthogonal part w.r.t. $\Phi^+$ and then let $C_2\rightarrow 0$ and analyze the behavior of the convex objective. After decomposition of $w_j$ such that $w_j=w_j^{\perp}+w_j^{||}$ the convex objective can be re-written as follows
 
-	
-		This objective is being minimized in $w_j$ and $b_j$. First, let us decompose $w_j$ into parallel and orthogonal part w.r.t. $\Phi^+$ and then let $C_2\rightarrow 0$ and analyze the behavior of the convex objective. After decomposition of $w_j$ such that $w_j=w_j^{\perp}+w_j^{||}$ the convex objective can be re-written as follows
+  	\begin{equation}
+        ||w_j^{\perp}+w_j^{||}||^{2} +C_1 \cdot 
+        h
+        \left(
+        	(w_j^{\perp}+w_j^{||})^T\Phi^+_j+b_j
+        \right)
+        +C_2\sum_{\Phi\in \mathcal N_j}
+        h
+        \left(
+        	-(w_j^{\perp}+w_j^{||})^T\Phi-b_j
+        \right) 	
+       	\label{eq:decomposed} 
+  	\end{equation}	
 
-	  	\begin{align}
-	  		\nonumber
-	        ||w_j^{\perp}+w_j^{||}||^{2} +&
-	        C_1 \cdot h
-	        \left(
-	        	(w_j^{\perp}+w_j^{||})^T\Phi^+_j+b_j
-	        \right)+
-	        C_2\sum_{\Phi\in \mathcal N_j} h
-	        \left(
-	        	-(w_j^{\perp}+w_j^{||})^T\Phi-b_j
-	        \right)
-	        = \\ 
-	        ||w_j^{\perp}+w_j^{||}||^{2} +&
-	        C_1 \cdot h
+  	Since $C_2 \rightarrow 0$ the first two terms dominate the equation \eqref{eq:decomposed}, hence in the limit case it follows that
+
+	  	\begin{equation}
+	        ||w_j^{||}||^2 +C_1 \cdot 
+	        h
 	        \left(
 	        	w_j^{||T}\Phi^+_j+b_j
-	        \right)+
-	        C_2\sum_{\Phi\in \mathcal N_j} h
+	        \right)
+	        \leq
+	        ||w_j||^2 +C_1 \cdot 
+	        h
 	        \left(
-	        	-(w_j^{\perp}+w_j^{||})^T\Phi-b_j
-	        \right)	
-	       	\label{eq:decomposed} 
-	  	\end{align}	
+	        	w_j^T\Phi^+_j+b_j
+	        \right)
+	       	\label{eq:bound} 
+	  	\end{equation}
 
-	  	Notice that in the second term the orthogonal part does not change the value of a dot-product since $(w_j^{\perp}+w_j^{||})\Phi^+=w_j^{||}\Phi^+$. Because $C_2 \rightarrow 0$ the first two terms dominate the equation \eqref{eq:decomposed}, hence in the limit case it follows that
+  	Notice that the penalty terms on both sides of inequality \eqref{eq:bound} are the same since
+	  	\begin{equation}
+	  	 	w_j^T\Phi^+_j+b_j=
+	  	 	(w_j^{\perp}+w_j^{||})^T\Phi^+_j+b_j=
+	  	 	w_j^{||T}\Phi^+_j+b_j
+	  	 	\nonumber
+	  	\end{equation}
+  	.
 
-		  	\begin{align}
-		  		||w_j||^2 +C_1 \cdot 
-		        h
-		        \left(
-		        	w_j^T\Phi^+_j+b_j
-		        \right)=
-		        ||w_j^{\perp}+w_j^{||}||^{2} +&
-		        C_1 \cdot h
-		        \left(
-		        	w_j^{||T}\Phi^+_j+b_j
-		        \right)
-		        \geq
-		        ||w_j^{||}||^2 +C_1 \cdot 
-		        h
-		        \left(
-		        	w_j^{||T}\Phi^+_j+b_j
-		        \right)
-		       	\label{eq:bound} 
-		  	\end{align}
+  	\textcolor{myRed}{Interpretation, re-normalization}
+  	This result shows that as $C2$ decreases the normal of the hyperplane that separates the positive exemplar from negative data tends to be parallel with $\Phi^+$. As $C_2$ grows, this normal declines such that distance from the negative data increases as shown in figure \ref{fig:C2effect}.
 
-	  	Notice that the penalty terms on both sides of inequality \eqref{eq:bound} are the same since
-		  	\begin{equation}
-		  	 	w_j^T\Phi^+_j+b_j=
-		  	 	(w_j^{\perp}+w_j^{||})^T\Phi^+_j+b_j=
-		  	 	w_j^{||T}\Phi^+_j+b_j
-		  	 	\nonumber
-		  	\end{equation}
-	  	.
-			\begin{figure}[ht!]
-			    \centering
-				    \subfigure[]{
-				        \centering
-				        \includegraphics[width=0.48\linewidth]{imgs/figW02.png}
-				    }
-				    \subfigure[]{
-				        \centering
-				        \includegraphics[width=0.48\linewidth]{imgs/figW01.png}
-				    }
-			    \caption{An illustration of the effect of decreasing a parameter $C_2$. As the paramterer $C_2$ is decreased the resulting vector $w$ is being parallel to $\Phi^+$.}
-			    \label{fig:C2effect}
-			\end{figure}
+		\begin{figure}[ht!]
+		    \centering
+			    \subfigure[]{
+			        \centering
+			        \includegraphics[width=0.48\linewidth]{imgs/figW02.png}
+			    }
+			    \subfigure[]{
+			        \centering
+			        \includegraphics[width=0.48\linewidth]{imgs/figW01.png}
+			    }
+		    \caption{An illustration of the effect of decreasing a parameter $C_2$. As the paramterer $C_2$ is decreased the resulting vector $w$ is being parallel to $\Phi^+$.}
+		    \label{fig:C2effect}
+		\end{figure}
 
+	Since the goal is to measure the similarity between two descriptors by an angle, equation \eqref{eq:class}, we interpret the new descriptor $\Psi_j$ as a normalized hypeplane normal such that
+	  	\begin{equation}
+	  		\Psi_j=\dfrac{w_j}{||w_j||}
+	  	\end{equation}.
 
-
-	%	\textcolor{myRed}{Take home message}\newline
-	%	As a conclusion, we have shown that when $C_2$ is close to zero the new descriptor $\Psi_j$ is identical to original $\Phi^+$, when $C_2$ increases $\Psi_j$ declines from $\Phi^+$ such that the measured distance between $\Psi_j$ and negative examples increases.
-
-	\paragraph{Interpretation, re-normalization.}
-	%  	\textcolor{myRed}{Interpretation, re-normalization}
-	  	This result shows that as $C2$ decreases the normal of the hyperplane that separates the positive exemplar from negative data tends to be parallel with $\Phi^+$. As $C_2$ grows, this normal declines such that distance from the negative data increases as shown in figure \ref{fig:C2effect}.
-
-
-		Since the goal is to measure the similarity between two descriptors by an angle, equation \eqref{eq:class}, we interpret the new descriptor $\Psi_j$ as a normalized hypeplane normal such that
-		  	\begin{equation}
-		  		\Psi_j=\dfrac{w_j}{||w_j||}
-		  	\end{equation}.
+	\textcolor{myRed}{Take home message}\newline
+	As a conclusion, we have shown that when $C_2$ is close to zero the new descriptor $\Psi_j$ is identical to original $\Phi^+$, when $C_2$ increases $\Psi_j$ declines from $\Phi^+$ such that the measured distance between $\Psi_j$ and negative examples increases.
 
 
 

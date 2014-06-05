@@ -28,10 +28,30 @@ Cummins, M., Newman, P.: Highly scalable appearance-only {SLAM} - {FAB-MAP}
   2.0.
 \newblock In: Proceedings of Robotics: Science and Systems. Seattle, USA (2009)
 
+\bibitem{Dalal05}
+Dalal, N., Triggs, B.: Histogram of oriented gradients for human detection.
+\newblock In: CVPR (2005)
+
+\bibitem{Doersch12}
+Doersch, C., Singh, S., Gupta, A., Sivic, J., Efros, A.A.: What makes paris
+  look like paris?
+\newblock {SIGGRAPH} \textbf{31}(4) (2012)
+
+\bibitem{Donahue13}
+Donahue, J., Jia, Y., Vinyals, O., Hoffman, J., Zhang, N., Tzeng, E., Darrell,
+  T.: Decaf: A deep convolutional activation feature for generic visual
+  recognition.
+\newblock arXiv:1310.1531  (2013)
+
 \bibitem{libsvm}
 Fan, R.E., Chang, K.W., Hsieh, C.J., Wang, X.R., Lin, C.J.: {LIBLINEAR}: A
   library for large linear classification.
 \newblock J. Machine Learning Research \textbf{9}, 1871--1874 (2008)
+
+\bibitem{Gronat13}
+Gronat, P., Obozinski, G., Sivic, J., Pajdla, T.: Learning and calibrating
+  per-location classifiers for visual place recognition.
+\newblock In: CVPR (2013)
 
 \bibitem{Gronat2013}
 Gronat, P., Obozinski, G., Sivic, J., Pajdla, T.: Learning and calibrating
@@ -39,12 +59,6 @@ Gronat, P., Obozinski, G., Sivic, J., Pajdla, T.: Learning and calibrating
 \newblock In: CVPR, pp. 907--914. IEEE (2013).
 \newblock
   \urlprefix\url{http://dblp.uni-trier.de/db/conf/cvpr/cvpr2013.html#GronatOSP13}
-
-\bibitem{imageGrow}
-Horaczek, S.: How many photos are uploaded to the internet every minute?
-  (2014).
-\newblock
-  \urlprefix\url{http://www.popphoto.com/news/2013/05/how-many-photos-are-uploaded-to-internet-every-minute}
 
 \bibitem{Jegou2009}
 Jegou, H., Douze, M., Schmid, C.: On the burstiness of visual elements.
@@ -75,6 +89,11 @@ J{\'e}gou, H., Perronnin, F., Douze, M., S{\'a}nchez, J., P{\'e}rez, P.,
 \newblock \urlprefix\url{http://hal.inria.fr/inria-00633013}.
 \newblock QUAERO
 
+\bibitem{Klinger13}
+Klingner, B., Martin, D., Roseborough, J.: Street view
+  motion-from-structure-from-motion.
+\newblock In: ICCV (2013)
+
 \bibitem{Knopp2010}
 Knopp, J., Sivic, J., Pajdla, T.: Avoidng confusing features in place
   recognition.
@@ -88,16 +107,14 @@ Krapac, J., Verbeek, J., Jurie, F.: {Modeling Spatial Layout with Fisher
 \newblock \doi{10.1109/ICCV.2011.6126406}.
 \newblock \urlprefix\url{http://hal.inria.fr/inria-00612277}
 
+\bibitem{Krizhevsky12}
+Krizhevsky, A., Sutskever, I., Hinton, G.E.: Imagenet classification with deep
+  convolutional neural networks.
+\newblock In: NIPS (2012)
+
 \bibitem{Lowe04}
 Lowe, D.: Distinctive image features from scale-invariant keypoints.
 \newblock IJCV \textbf{60}(2), 91--110 (2004)
-
-\bibitem{Majdik2013}
-Majdik, A., Albers-Schoenberg, Y., Scaramuzza, D.: Mav urban localization from
-  google street view data.
-\newblock In: IROS, pp. 3979--3986. IEEE (2013).
-\newblock
-  \urlprefix\url{http://dblp.uni-trier.de/db/conf/iros/iros2013.html#MajdikAS13}
 
 \bibitem{Malisiewicz11}
 Malisiewicz, T., Gupta, A., Efros, A.A.: Ensemble of exemplar-svms for object
@@ -107,6 +124,11 @@ Malisiewicz, T., Gupta, A., Efros, A.A.: Ensemble of exemplar-svms for object
 \bibitem{Nister06}
 Nister, D., Stewenius, H.: Scalable recognition with a vocabulary tree.
 \newblock In: CVPR (2006)
+
+\bibitem{Oquab14}
+Oquab, M., Bottou, L., Laptev, I., Sivic, J.: Learning and transferring
+  mid-level image representations using convolutional neural networks.
+\newblock In: CVPR (2014)
 
 \bibitem{Perronnin2007}
 Perronnin, F., Dance, C.R.: Fisher kernels on visual vocabularies for image
@@ -129,16 +151,37 @@ Philbin, J., Chum, O., Isard, M., Sivic, J., Zisserman, A.: Object retrieval
 Schindler, G., Brown, M., Szeliski, R.: City-scale location recognition.
 \newblock In: CVPR (2007)
 
+\bibitem{Sermanet13}
+Sermanet, P., Eigen, D., Zhang, X., Mathieu, M., Fergus, R., LeCun, Y.:
+  Overfeat: Integrated recognition, localization and detection using
+  convolutional networks.
+\newblock arXiv:1312.6229  (2013)
+
+\bibitem{Shrivastava11}
+Shrivastava, A., Malisiewicz, T., Gupta, A., Efros, A.A.: Data-driven visual
+  similarity for cross-domain image matching.
+\newblock In: SIGGRAPH ASIA (2011)
+
 \bibitem{Simonyan2013}
 Simonyan, K., Parkhi, O.M., Vedaldi, A., Zisserman, A.: {F}isher {V}ector
   {F}aces in the {W}ild.
 \newblock In: British Machine Vision Conference (2013)
+
+\bibitem{Singh12}
+Singh, S., Gupta, A., Efros, A.A.: Unsupervised discovery of mid-level
+  discriminative patches.
+\newblock In: ECCV (2012)
 
 \bibitem{Sivic2003}
 Sivic, J., Zisserman, A.: {Video Google}: {A} text retrieval approach to object
   matching in videos.
 \newblock In: ICCV (2003).
 \newblock \urlprefix\url{http://www.robots.ox.ac.uk/~vgg}
+
+\bibitem{Tighe13}
+Tighe, J., Lazebnik, S.: Finding things: Image parsing with regions and
+  per-exemplar detectors.
+\newblock In: CVPR (2013)
 
 \bibitem{Torii2011}
 Torii, A., Sivic, J., Pajdla, T.: Visual localization by linear combination of

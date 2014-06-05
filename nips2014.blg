@@ -1,4 +1,4 @@
-This is BibTeX, Version 0.99d (TeX Live 2013/Debian)
+This is BibTeX, Version 0.99d (TeX Live 2011)
 Capacity: max_strings=35307, hash_size=35307, hash_prime=30011
 The top-level auxiliary file: nips2014.aux
 The style file: spmpsci.bst
@@ -7,45 +7,45 @@ Database file #2: vggroup.bib
 Database file #3: cvww_template.bib
 Database file #4: mybib.bib
 Warning--I didn't find a database entry for "vlfeat"
-You've used 25 entries,
+You've used 34 entries,
             2946 wiz_defined-function locations,
-            1053 strings with 12830 characters,
-and the built_in function-call counts, 19301 in all, are:
-= -- 2137
-> -- 490
-< -- 8
-+ -- 283
-- -- 176
-* -- 884
-:= -- 1991
-add.period$ -- 46
-call.type$ -- 25
-change.case$ -- 204
+            1090 strings with 14020 characters,
+and the built_in function-call counts, 22764 in all, are:
+= -- 2303
+> -- 703
+< -- 7
++ -- 362
+- -- 254
+* -- 1108
+:= -- 2556
+add.period$ -- 53
+call.type$ -- 34
+change.case$ -- 284
 chr.to.int$ -- 0
-cite$ -- 25
-duplicate$ -- 2067
-empty$ -- 1319
-format.name$ -- 199
-if$ -- 4085
+cite$ -- 34
+duplicate$ -- 2369
+empty$ -- 1654
+format.name$ -- 287
+if$ -- 4781
 int.to.chr$ -- 0
-int.to.str$ -- 25
-missing$ -- 262
-newline$ -- 122
-num.names$ -- 50
-pop$ -- 871
+int.to.str$ -- 34
+missing$ -- 356
+newline$ -- 157
+num.names$ -- 68
+pop$ -- 1031
 preamble$ -- 1
-purify$ -- 138
+purify$ -- 195
 quote$ -- 0
-skip$ -- 1017
+skip$ -- 1061
 stack$ -- 0
-substring$ -- 781
-swap$ -- 1595
-text.length$ -- 8
+substring$ -- 763
+swap$ -- 1672
+text.length$ -- 7
 text.prefix$ -- 0
 top$ -- 0
-type$ -- 100
+type$ -- 136
 warning$ -- 0
-while$ -- 86
-width$ -- 27
-write$ -- 279
+while$ -- 101
+width$ -- 36
+write$ -- 357
 (There was 1 warning)
