@@ -73,6 +73,30 @@ Address \\
 
 \begin{document}
 
+<<<<<<< HEAD
+%\maketitle
+%***********************************************************
+% *** THIS puts a figure between title and abstract ***
+%\twocolumn
+%[
+{%
+    %\renewcommand\twocolumn[1][]{#1}%
+    \maketitle
+    \begin{center}
+        \centering
+        \vspace*{-10mm}
+        \includegraphics[width=0.3\linewidth]{imgs/ex4/query}
+        \includegraphics[width=0.6\linewidth]{imgs/mapGoogleCrop}
+        %\fbox{\rule[-.5cm]{0cm}{4cm} \rule[-.5cm]{14cm}{0cm}}
+        % \captionof{figure}
+        % {
+        %   Some caption 
+        % }
+    \end{center}%
+}
+%]
+% ******************************************************
+=======
 \maketitle
 
 %%***********************************************************
@@ -94,6 +118,7 @@ Address \\
 %}
 %%]
 %% ******************************************************
+>>>>>>> 594ea42088dc5974a430c2592f4c45692df64cf6
 
 \begin{abstract}
 %	The aim of this work is to localize a query photograph by finding other images depicting the same place in a large geotagged image database. 
@@ -604,14 +629,15 @@ the direction of the optimal $w$ will be different from $w^{||}$ and will change
 			Since all the query images have associated GPS location we can compute their spatial distance from the database images returned by the matching method. We consider a query image to be correctly localized if its retrieved database image lies within a perimeter of $20m$ from the query image.
 
 
-    \begin{figure}[t!]
-        \centering
-        \includegraphics[width=\linewidth]{imgs/plotPitt25k}    
-        \caption{
-            \textbf{Evaluation on Pittsburgh 25k \cite{Gronat13} dataset.} The fraction of correctly recognized queries (recall@K, y-axis) vs. the number of topK retrieved database images for different FV dimensions. The proposed method (e-SVM) consistently improves results across the whole range of $K$  and all dimensions.
-        }
-        \label{fig:recall}
-    \end{figure}
+\begin{figure}[t!]
+    \centering
+    \includegraphics[width=\linewidth]{imgs/plotPitt25k}    
+    \caption{
+        \textbf{Evaluation on Pittsburgh 25k \cite{Gronat13} dataset.} The fraction of correctly recognized queries (recall@K, y-axis) vs. the number of topK retrieved database images for different FV dimensions. The proposed method (e-SVM) consistently improves results across the whole range of $K$  and all dimensions.
+    }
+    \label{fig:recall}
+\end{figure}
+
 
 	%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
    \subsection{Implementation details}
@@ -744,9 +770,9 @@ the direction of the optimal $w$ will be different from $w^{||}$ and will change
 	\caption{ \textcolor{myRed}{}
 		The percentage of correctly localized test queries for which the topK ranked database image is within $20$ meters from the ground truth query position. The proposed method (svmFV) outperforms the baseline methods.
 		}
-    	\label{tab:recall}
-    \end{centering}
-    \end{table}
+	\label{tab:recall}
+\end{centering}
+\end{table}
 
 
     \begin{figure}
@@ -798,6 +824,7 @@ the direction of the optimal $w$ will be different from $w^{||}$ and will change
                 \colorbox{myRed}{\includegraphics[height=16mm]{imgs/ex2/FV4}}
             \end{minipage} 
         \end{minipage}
+<<<<<<< HEAD
         \vspace{3mm}
         \\
         %%%%%%%%%%% Example 3 %%%%%%%%%%%%%%%
@@ -850,7 +877,11 @@ the direction of the optimal $w$ will be different from $w^{||}$ and will change
         \end{minipage}
         %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
         \caption{
-            Each example shows a query image (left) together with correct (green) and incorrect (red) matches from the database obtained by our learnt descriptors (top) and the raw Fisher vector desriptor baseline (bottom). For each method we show the top 4 matches from the database for the target dimension 128.        
+            An example of place recognition improvementd. In each row: \emph{Left} Query image, \emph{Top right} Four top-ranked database images using e-SVM FV descriptors \emph{Bottom right} Four top-ranked database images using FV descriptors. The FVs were compressed to dimension of 128 by PCA.
+=======
+        \caption{Each example shows a query image (left) together with correct (green) and incorrect (red) matches from the database obtained by our learnt descriptors (top) and the raw Fisher vector desriptor baseline (bottom). For each method we show the top 4 matches from the database for the target dimension 128.
+%            An example of place recognition improvement. \emph{Left} Query image, \emph{Top right} Four top-ranked database images using e-SVM FV descriptors \emph{Bottom right} Four top-ranked database images using FV descriptors. The FVs were compressed to dimension of 128 by PCA.
+>>>>>>> 594ea42088dc5974a430c2592f4c45692df64cf6
         }
         \label{fig:images}
     \end{figure}
