@@ -98,7 +98,7 @@ Address \\
 %	The contributions are threefold: First, we represent each database image by a Fisher vector and for each vector we learn per-location SVM classifiers. We show that trained and re-normalized SVM weight can be used as an embedded descriptor that replaces original Fisher vector. Though the SVMs were learned independently no further calibration is necessary. We perform two experiments on state-of-the-art datasets for place recognition and we show that our method consistently improves the results for different dimensions of decorrelated Fischer vectors.
 		
 Exemplar support vector machines (e-SVM) are emerging as a powerful tool to learn a discriminative pre-example representation for
-visual recognition. However, as individual classifiers are learnt independently for each positive example the classifier scores require careful and tedious calibration on an independent held-out data. 
+visual recognition. However, as individual classifiers are learnt independently for each positive example, the classifier scores require careful and tedious calibration on an independent held-out data. 
 The contribution of this work are three fold.
 First, we analyze the e-SVM cost and show that the learnt hyperplane can be interpreted
 as a new descriptor that replaces the original positive example and is re-weighted to increase its distance from the negative data.
@@ -138,9 +138,8 @@ First, we apply the exemplar SVM training to compact Fisher vector~\cite{Jegou20
 Second, to avoid the expensive classifier calibration we analyze the exemplar SVM cost and show that the learnt hyperplane can be interpreted
 as a new descriptor that replaces the original positive example and is re-weighted to increase its distance from the negative data.
 As a result of this analysis, we demonstrate that after an appropriate normalization of the new re-weighted descriptor no further calibration is necessary.
-
-We show improved results on place recognition using learnt compact Fisher vector descriptors of different dimensionality without the need for additional calibration.  
-The same procedure be potentially applied to other descriptors such as HOG~\cite{Dalal05} or the recently developed convolutional neural network features~\cite{Donahue13,Krizhevsky12,Oquab14,Sermanet13}.      
+We show improved results on place recognition using learnt compact Fisher vector descriptors~\cite{Jegou2011} of different dimensionality. % without the need for additional calibration.  
+%The same procedure can be potentially applied to other descriptors such as HOG~\cite{Dalal05} or the recently developed convolutional neural network features~\cite{Donahue13,Krizhevsky12,Oquab14,Sermanet13}.      
 
 %Similar to~\cite{Gronat13}, in this work we apply exemplar SVM training to learn a location specific descriptor for large-scale place recognition in street-level image collections such as Google Street-view. This is a practically important set-up with applications in robotics, augmented reality or navigation.
 %% Finding images depicting in the same place is a practially important set-up with applications    
@@ -189,7 +188,7 @@ The same procedure be potentially applied to other descriptors such as HOG~\cite
 \vspace{-3mm}
 \subsection*{Fisher vector image representations} \vspace{-3mm}
     Fisher vector image representations have recently demonstrated excellent performance for a number of visual recognition tasks~\cite{Chatfield11,Jegou12,Krapac2011,Simonyan2013}.
-    They are specially suited for retrieval applications since they are robust to image appearance variations and capture richer image statistics than the simple bag-of-visual-words (BOW) aggregation. However, the raw extracted Fisher vectors are typically high-dimensional, e.g. with 32,768 non-sparse dimensions, which is impractical for large-scale visual recognition and indexing applications. Hence, their dimensionality is often reduced by principal component analysis (PCA) and further quantized for efficient indexing using e.g. product quantizer~\cite{Jegou12}.  Other recent work has demonstrated improved performance in a face recognition application by finding discriminative projection using large number of training face data~\cite{Simonyan2013}. Our work is complementary to these methods as it operates on the projected low-dimensional descriptor and further learns discriminative re-weighting of the descriptor for specific to each image in the database using per-exemplar support vector machine~\cite{Malisiewicz11}.
+    They are specially suited for retrieval applications since they are robust to image appearance variations and capture richer image statistics than the simple bag-of-visual-words (BOW) aggregation. However, the raw extracted Fisher vectors are typically high-dimensional, e.g. with 32,768 non-sparse dimensions, which is impractical for large-scale visual recognition and indexing applications. Hence, their dimensionality is often reduced by principal component analysis (PCA) and further quantized for efficient indexing using e.g. product quantizer~\cite{Jegou12}.  Other recent work has demonstrated improved performance in a face recognition application by finding discriminative projection using large number of training face data~\cite{Simonyan2013}. Our work is complementary to these methods as it operates on the projected low-dimensional descriptor and further learns discriminative re-weighting of the descriptor specific to each image in the database using per-exemplar support vector machine~\cite{Malisiewicz11}.
 
 % In general, these results have been achieved by optimizing: 	
 % 	\begin{enumerate}[(i)]
@@ -208,7 +207,7 @@ The same procedure be potentially applied to other descriptors such as HOG~\cite
     category-level recognition~\cite{Malisiewicz11}, cross-domain retrieval~\cite{Shrivastava11}, scene parsing~\cite{Tighe13}, %image to 3D model alignment~\cite{Aubry13},
     place recognition~\cite{Gronat13} or as an initialization  for more complex discriminative clustering models~\cite{Doersch12,Singh12}. The main idea is to train a linear support vector machine (SVM) classifier from a single positive example and a large number of negatives. The intuition is that the resulting weight vector will give a higher weight to the discriminative dimensions of the positive training data point and will down weight dimensions that are non-discriminative with respect to the negative training data. A key advantage is that each per-exemplar classifier can be trained independently and hence the learning can be heavily parallelized. 
     The per-exemplar training brings however also an important drawback. As each classifier is trained independently a
-    careful calibration of the resulting classifier scores on is required~\cite{Gronat13,Malisiewicz11}. 
+    careful calibration of the resulting classifier scores is required~\cite{Gronat13,Malisiewicz11}. 
 
 %
 %\paragraph{Large-scale place recognition.}
@@ -219,7 +218,7 @@ The same procedure be potentially applied to other descriptors such as HOG~\cite
 \subsection*{Contributions} \vspace{-3mm}
     The contributions of this work are threefold.
     First, we analyze the the exemplar support vector machine objective and show that the learnt hyperplane can be interpreted
-    as a new descriptor that replaces the original positive example and is re-weighted to increase its distance from the negative data.
+    as a new descriptor that replaces the original positive example and is re-weighted to increase its separation from the negative data.
     Second, we demonstrate that after an appropriate normalization of the new re-weighted descriptor no further calibration is necessary. 
     Third, we apply e-SVM training to compact Fisher vector descriptors for large-scale place recognition resulting in  
     a {\em discriminative} yet {\em compact} representation of each image in the database. 
@@ -257,51 +256,62 @@ The same procedure be potentially applied to other descriptors such as HOG~\cite
 %
 %
 
-%%%%%%%%%%%%%%%%%%%
-\section{Fisher vector overview}
-\label{sec:FV}
-%%%%%%%%%%%%%%%%%%%
-	The Fisher vector can be thought of as an extension of BOW \cite{Sivic03} that is achieved by considering a high-order statistics of the distribution of the feature descriptors. It aggregates a large set of descriptors into a high-dimensional representation of the fixed size. In the following text we briefly overview some basic concepts of Fisher vectors, its normalization and standard dimensionality reduction.
 
-	\subsection{Computing Fisher vectors}
-		It first starts with learning a generative model of the local image descriptors $x$ of the dimension~$d$ (in our case we use SIFT features, see details in Sec. \ref{sec:exp}). The model is assumed to follow a GMM with $N$ components and diagonal covariances. This model can be understood as a probabilistic visual vocabulary. Having the model trained, the Fisher vector of the sample of the image descriptors is computed as a gradient of the sample's likelihood with respect to the learned parameters of the GMM, which is subsequently scaled by inverse square root of the Fisher information matrix \cite{Perronnin2007}. Considering only the derivatives w.r.t. the mean and covariances, we a obtain representation which captures the average of the first and second order differences between the descriptors and each of the GMM center $k$. For the image containing $T$ feature vectors it can be expressed as follows:
-		
-		\begin{align}
-			\Phi^{(1)}_k&=
-			\dfrac{1}{N \sqrt(w_k)}\sum_{j=1}^{T} \alpha_j(k) \left(
-			\dfrac{x_j-\mu_k}{\sigma_k}
-			\right)
-			\label{eq:FVmean}
-			\\
-			\Phi^{(2)}_k&=
-			\dfrac{1}{N \sqrt(2w_k)}\sum_{j=1}^{T} \alpha_j(k) \left(
-			\dfrac{(x_j-\mu_k)^2}{\sigma_k^2}-1 
-			\right)
-			\label{eq:FVvar}
-		\end{align}
 
-		\noindent
-		where $w_k, \mu_k$ and $\sigma_k$ are weight, mean and diagonal of covariance matrix for $k$-th component of the learned GMM and $\alpha_j(k)$ is a soft assignment of the $j$-th feature $x_j$ to the Gaussian $k$. The resulting Fisher vector  $\Phi$ is then concatenation of these gradients which forms into a $2Nd$ dimensional vector such that $\Phi=[\Phi^{(1)T}_1,\Phi^{(2)T}_1,...,\Phi^{(1)T}_N,\Phi^{(2)T}_N]^T$.
 
-		While some works, e.g.\cite{Perronnin2010}, use only a partial derivatives w.r.t. the mean parameters (equation~\eqref{eq:FVmean}), we use partial derivatives both w.r.t. the mean and variance because this approach have been implemented in a library that we used (details are provided in section \ref{sec:exp}). As reported in \cite{Jegou2010} both approaches provide comparable results.
 
-		\subsection{Normalization}
-			As in the case of standard BOW, Fisher vector is typically $L2$ normalized in order to measure similarity between two FVs by a dot-product. However it has been shown that direct $L2$ normalization is suboptimal and better performance can be achieved by power-normalization followed by $L2$ normalization. Thus the normalization operator can be written as follows:
-			
-			\begin{equation}
-				L(z)=\dfrac{\text{sign} (z) \abs{z}^\alpha}{\norm{\text{sign}(z) \abs{z}^\alpha}}
-				\label{eq:Loperator}
-			\end{equation}
+%
+%%%%%%%%%%%%%%%%%%%%
+%\section{Fisher vector overview}
+%\label{sec:FV}
+%%%%%%%%%%%%%%%%%%%%
+%	The Fisher vector can be thought of as an extension of BOW \cite{Sivic03} that is achieved by considering a high-order statistics of the distribution of the feature descriptors. It aggregates a large set of descriptors into a high-dimensional representation of the fixed size. In the following text we briefly overview some basic concepts of Fisher vectors, its normalization and standard dimensionality reduction.
+%
+%	\subsection{Computing Fisher vectors}
+%		It first starts with learning a generative model of the local image descriptors $x$ of the dimension~$d$ (in our case we use SIFT features, see details in Sec. \ref{sec:exp}). The model is assumed to follow a GMM with $N$ components and diagonal covariances. This model can be understood as a probabilistic visual vocabulary. Having the model trained, the Fisher vector of the sample of the image descriptors is computed as a gradient of the sample's likelihood with respect to the learned parameters of the GMM, which is subsequently scaled by inverse square root of the Fisher information matrix \cite{Perronnin2007}. Considering only the derivatives w.r.t. the mean and covariances, we a obtain representation which captures the average of the first and second order differences between the descriptors and each of the GMM center $k$. For the image containing $T$ feature vectors it can be expressed as follows:
+%		
+%		\begin{align}
+%			\Phi^{(1)}_k&=
+%			\dfrac{1}{N \sqrt(w_k)}\sum_{j=1}^{T} \alpha_j(k) \left(
+%			\dfrac{x_j-\mu_k}{\sigma_k}
+%			\right)
+%			\label{eq:FVmean}
+%			\\
+%			\Phi^{(2)}_k&=
+%			\dfrac{1}{N \sqrt(2w_k)}\sum_{j=1}^{T} \alpha_j(k) \left(
+%			\dfrac{(x_j-\mu_k)^2}{\sigma_k^2}-1 
+%			\right)
+%			\label{eq:FVvar}
+%		\end{align}
+%
+%		\noindent
+%		where $w_k, \mu_k$ and $\sigma_k$ are weight, mean and diagonal of covariance matrix for $k$-th component of the learned GMM and $\alpha_j(k)$ is a soft assignment of the $j$-th feature $x_j$ to the Gaussian $k$. The resulting Fisher vector  $\Phi$ is then concatenation of these gradients which forms into a $2Nd$ dimensional vector such that $\Phi=[\Phi^{(1)T}_1,\Phi^{(2)T}_1,...,\Phi^{(1)T}_N,\Phi^{(2)T}_N]^T$.
+%
+%		While some works, e.g.\cite{Perronnin2010}, use only a partial derivatives w.r.t. the mean parameters (equation~\eqref{eq:FVmean}), we use partial derivatives both w.r.t. the mean and variance because this approach have been implemented in a library that we used (details are provided in section \ref{sec:exp}). As reported in \cite{Jegou2010} both approaches provide comparable results.
+%
+%		\subsection{Normalization}
+%			As in the case of standard BOW, Fisher vector is typically $L2$ normalized in order to measure similarity between two FVs by a dot-product. However it has been shown that direct $L2$ normalization is suboptimal and better performance can be achieved by power-normalization followed by $L2$ normalization. Thus the normalization operator can be written as follows:
+%			
+%			\begin{equation}
+%				L(z)=\dfrac{\text{sign} (z) \abs{z}^\alpha}{\norm{\text{sign}(z) \abs{z}^\alpha}}
+%				\label{eq:Loperator}
+%			\end{equation}
+%
+%			\noindent
+%			where $\alpha \in (0,1)$ is an element-wise power and $z \in R^d$ is an arbitrary real vector. As mentioned in the introduction, the power-normalization has the effect of suppression of the descriptors that occur frequently in the image (bursty features), these can be for instance periodical structures such as skyscraper windows or bricks of the wall. In our setup we use $\alpha=0.5$ as it has been reported by Jegou et al. \cite{Jegou2012HAL} that this value is optimal for wide range of GMM components $N$.
+%
+%		\subsection{Dimension reduction}
+%			The resulted Fisher vector is a high-dimensional representation of an image, which dimensionality depends only on number of $N$ components of the GMM and dimension $d$ of the local image descriptors which is fixed. In practice, the PCA is being used for decorrelation and projection to a lower dimensional space because it subsequently directly affects a size of the indexed signature. % (see Sec. \ref{sec:overview} and \cite{Jegou2011}).
+%
+%			We observed that after the PCA decorrelation it is important to $L2$ re-normalize projected FV to achieve better performance. Our interpretation is that after performing the PCA the higher dimensions contain a noise that affects only a magnitude of the projected vectors but not its direction. Furthermore we observed that even slightly better results can be achieved by using the normalization operator \eqref{eq:Loperator} instead of $L2$.
+%
+%			Finally, it is worth noting that PCA projection into a `not-too-low' dimensional space can actually slightly improve the performance of the full FV. What that `not-too-low' actually means have been partially discussed in \cite{Jegou2012HAL}. However, in general as the dimension decreases the performance of decorrelated FV decrease which is, indeed, what we observe in our experiments. In the next section we therefore aim on enhancing the performance of projected FVs.   
+%
 
-			\noindent
-			where $\alpha \in (0,1)$ is an element-wise power and $z \in R^d$ is an arbitrary real vector. As mentioned in the introduction, the power-normalization has the effect of suppression of the descriptors that occur frequently in the image (bursty features), these can be for instance periodical structures such as skyscraper windows or bricks of the wall. In our setup we use $\alpha=0.5$ as it has been reported by Jegou et al. \cite{Jegou2012HAL} that this value is optimal for wide range of GMM components $N$.
 
-		\subsection{Dimension reduction}
-			The resulted Fisher vector is a high-dimensional representation of an image, which dimensionality depends only on number of $N$ components of the GMM and dimension $d$ of the local image descriptors which is fixed. In practice, the PCA is being used for decorrelation and projection to a lower dimensional space because it subsequently directly affects a size of the indexed signature. % (see Sec. \ref{sec:overview} and \cite{Jegou2011}).
 
-			We observed that after the PCA decorrelation it is important to $L2$ re-normalize projected FV to achieve better performance. Our interpretation is that after performing the PCA the higher dimensions contain a noise that affects only a magnitude of the projected vectors but not its direction. Furthermore we observed that even slightly better results can be achieved by using the normalization operator \eqref{eq:Loperator} instead of $L2$.
 
-			Finally, it is worth noting that PCA projection into a `not-too-low' dimensional space can actually slightly improve the performance of the full FV. What that `not-too-low' actually means have been partially discussed in \cite{Jegou2012HAL}. However, in general as the dimension decreases the performance of decorrelated FV decrease which is, indeed, what we observe in our experiments. In the next section we therefore aim on enhancing the performance of projected FVs.   
+
 
 
 %\section{Per-exemplar SVM and Fischer vectors}
@@ -316,7 +326,7 @@ The same procedure be potentially applied to other descriptors such as HOG~\cite
 	\end{equation}
 %	Note that both the query and database vectors are L2 normalized and hence the dot product measures the cosine of   
 	In other words, the aim is to replace each original database Fisher vector $\Phi_j$ with a new vector $\Psi_j$ that is more discriminative in the sense of separation from descriptors of images depicting other places. 
-	Inspired by~\cite{Gronat2013} we investigate applying the exemplar support vector machine (e-SVM)~\cite{} for this task. 
+	Inspired by~\cite{Gronat2013} we investigate applying the exemplar support vector machine (e-SVM)~\cite{Malisiewicz11} for this task. 
 	e-SVM learns a linear classifier $w_j^T\Phi+b_j$ given the descriptor $\Phi_j^+$ of place $j$ as a single positive example (with target label +1) and a large number of negative descriptors $\mathcal N_j$ from other places in the database (with target labels -1).
 	The intuition is that the resulting weight $w_j$ vector will give a higher weight to the dimensions of the descriptor that are discriminative and will down-weight dimensions that are non-discriminative with respect to the negative training data collected from other far-away places.  The optimal $w_j$ and $b_j$ are obtained
 	by minimizing the following objective  
@@ -576,7 +586,7 @@ the direction of the optimal $w$ will be different from $w^{||}$ and will change
     \centering
     \includegraphics[width=\linewidth]{imgs/plotPitt25k}    
     \caption{
-        \textbf{Evaluation on Pittsburgh 25k \cite{Gronat13} dataset.} The fraction of correctly recognized queries (recall@K, y-axis) vs. the number of topK retrieved datbase images for different FV dimensions. Proposed method (e-SVM) consistently improves the results over all dimensions.
+        \textbf{Evaluation on Pittsburgh 25k \cite{Gronat13} dataset.} The fraction of correctly recognized queries (recall@K, y-axis) vs. the number of topK retrieved database images for different FV dimensions. The proposed method (e-SVM) consistently improves results across the whole range of $K$  and all dimensions.
     }
     \label{fig:recall}
 \end{figure}
@@ -607,7 +617,7 @@ the direction of the optimal $w$ will be different from $w^{||}$ and will change
 %	   	\paragraph{SIFT features:}
 %	   		For all images in turn SIFT local descriptors~\cite{Lowe04} are extracted and subsequently these features are converted to a rootSIFT \cite{Arandjelovic12}. %For extraction we use publicly available library {\tt vlfeat}~\cite{vlfeat}.
 	    
-	    \vspace{-4mm}
+%	    \vspace{-4mm}
 	   	\paragraph{Implementation details of the BOW baseline.}	
 		We compare performance to a bag-of-visual-words baseline, where
 	    	a vocabulary of 100k visual words is built by approximate k-means clustering~\cite{Philbin07} from a subset of features from 5,000 randomly selected images. A tf-idf~\cite{Sivic03} vector is computed for each image by assigning each descriptor to the nearest cluster center.  Finally, all tf-idf vectors are normalized to have unit $L_2$ norm.
@@ -620,7 +630,7 @@ the direction of the optimal $w$ will be different from $w^{||}$ and will change
 %
 %	    	Finally, to compute the FV of an image we (i) compute the rootSIFTs and perform the PCA decorrelation to $d=64$ space, (ii) use the learned GMM and decorrelated descriptors to compute full FV (iii) project the full FV into lower dimensional spaces, namely to $2^\beta$ where $\beta=7\dots 14$ and (iv) re-normalize projected FVs by operator \eqref{eq:Loperator}.
 
-	    \vspace{-4mm}
+%	    \vspace{-4mm}
 %	    \paragraph{Exemplar SVM learning and  }
 \paragraph{Learning parameters and training data.}
 			To learn the exemplar support vector machine for each database image $j$, the positive and negative training data are constructed as follows. 
@@ -705,6 +715,8 @@ the direction of the optimal $w$ will be different from $w^{||}$ and will change
 \section{Conclusions}
 
 
+
+% - 
 
 
 
