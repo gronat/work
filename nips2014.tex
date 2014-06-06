@@ -261,7 +261,7 @@ The same procedure be potentially applied to other descriptors such as HOG~\cite
 \section{Fisher vector overview}
 \label{sec:FV}
 %%%%%%%%%%%%%%%%%%%
-	The Fisher vector can be thought of as an extension of BOW \cite{Sivic2003} that is achieved by considering a high-order statistics of the distribution of the feature descriptors. It aggregates a large set of descriptors into a high-dimensional representation of the fixed size. In the following text we briefly overview some basic concepts of Fisher vectors, its normalization and standard dimensionality reduction.
+	The Fisher vector can be thought of as an extension of BOW \cite{Sivic03} that is achieved by considering a high-order statistics of the distribution of the feature descriptors. It aggregates a large set of descriptors into a high-dimensional representation of the fixed size. In the following text we briefly overview some basic concepts of Fisher vectors, its normalization and standard dimensionality reduction.
 
 	\subsection{Computing Fisher vectors}
 		It first starts with learning a generative model of the local image descriptors $x$ of the dimension~$d$ (in our case we use SIFT features, see details in Sec. \ref{sec:exp}). The model is assumed to follow a GMM with $N$ components and diagonal covariances. This model can be understood as a probabilistic visual vocabulary. Having the model trained, the Fisher vector of the sample of the image descriptors is computed as a gradient of the sample's likelihood with respect to the learned parameters of the GMM, which is subsequently scaled by inverse square root of the Fisher information matrix \cite{Perronnin2007}. Considering only the derivatives w.r.t. the mean and covariances, we a obtain representation which captures the average of the first and second order differences between the descriptors and each of the GMM center $k$. For the image containing $T$ feature vectors it can be expressed as follows:
@@ -297,7 +297,7 @@ The same procedure be potentially applied to other descriptors such as HOG~\cite
 			where $\alpha \in (0,1)$ is an element-wise power and $z \in R^d$ is an arbitrary real vector. As mentioned in the introduction, the power-normalization has the effect of suppression of the descriptors that occur frequently in the image (bursty features), these can be for instance periodical structures such as skyscraper windows or bricks of the wall. In our setup we use $\alpha=0.5$ as it has been reported by Jegou et al. \cite{Jegou2012HAL} that this value is optimal for wide range of GMM components $N$.
 
 		\subsection{Dimension reduction}
-			The resulted Fisher vector is a high-dimensional representation of an image, which dimensionality depends only on number of $N$ components of the GMM and dimension $d$ of the local image descriptors which is fixed. In practice, the PCA is being used for decorrelation and projection to a lower dimensional space because it subsequently directly affects a size of the indexed signature (see Sec. \ref{sec:overview} and \cite{Jegou2011}).
+			The resulted Fisher vector is a high-dimensional representation of an image, which dimensionality depends only on number of $N$ components of the GMM and dimension $d$ of the local image descriptors which is fixed. In practice, the PCA is being used for decorrelation and projection to a lower dimensional space because it subsequently directly affects a size of the indexed signature. % (see Sec. \ref{sec:overview} and \cite{Jegou2011}).
 
 			We observed that after the PCA decorrelation it is important to $L2$ re-normalize projected FV to achieve better performance. Our interpretation is that after performing the PCA the higher dimensions contain a noise that affects only a magnitude of the projected vectors but not its direction. Furthermore we observed that even slightly better results can be achieved by using the normalization operator \eqref{eq:Loperator} instead of $L2$.
 
@@ -512,6 +512,7 @@ the direction of the optimal $w$ will be different from $w^{||}$ and will change
 	  given by equation \eqref{eq:class}, additional normalization of the learnt $w$ is necessary.
 	      Hence we define the new descriptor $\Psi_j$ as the normalized hyperplane normal $w_j$
 		  	\begin{equation}
+				\label{eq:normalization}
 		  		\Psi_j=\dfrac{w_j}{||w_j||}.
 		  	\end{equation}
 
@@ -551,19 +552,24 @@ the direction of the optimal $w$ will be different from $w^{||}$ and will change
 
 %   	\textcolor{myRed}{(TODO: In Results show (i) how much it differs e.g. dot product with original FV, (ii) how the performance changes with C2 e.g. x-validation plot or just plot.)}
 
+
+%%%%%%%%%%%%%%%%%%%%%
 \section{Experimental evaluation}
 \label{sec:exp}
-	In this section we first describe the experimental datasets, then we give implementation details and finally compare performance of the proposed approach on two datasets with several baseline methods.
+%%%%%%%%%%%%%%%%%%%%%
+
+	In this section we first describe the experimental set-up, then we give implementation details, and finally report results of the proposed approach on two datasets where we compare performance with raw Fisher vector matching and the bag-of-visual-words baseline. % with several baseline methods.
 
 	%%%%%%%%%%%%%%%%%%%%%%%%%%
-   	\subsection{Image datasets}
+   	\subsection{Experimental set-up}
    	%%%%%%%%%%%%%%%%%%%%%%%%%%
-		We performed our experiments on a database of Google Street View images from the Internet. For evaluation we have used two datasets. The first one is identical to \cite{Gronat2013, Torii2011} ($25k$ of images), the latter one is an extension extension of this dataset to achieve a higher spatial density ($55k$ of images).
-
-		We downloaded panoramas from Pittsburgh (U.S.) covering roughly an area of $1.3 \times 1.2 \; {\rm km}^2$. Similar to~\cite{Chen11}, for each panorama we generate 12 overlapping perspective views corresponding to two different elevation angles to capture both the street-level scene and the building fa\c{c}ades, resulting in a total of 24 perspective views each with $90^\circ$ FOV and resolution of $960 \times 720$ pixels.
-
-		As a query set with known ground truth GPS positions, we use the 8999 panoramas from the Google Street View research dataset, which cover approximately the same area, but were captured at a different time, and typically depict the same places from different viewpoints and under different illumination conditions. For each test panorama, we generate perspective images as described above. Finally, we randomly select out of all generated perspective views a subset of 4k images, which is used as a test set to evaluate the performance of the proposed approach.
-
+		We performed experiments on a database of Google Street View images of Pittsburgh downloaded from the Internet. The data contains panoramas covering roughly an area of $1.3 \times 1.2 \; {\rm km}^2$. 		
+		Similar to~\cite{Chen11}, for each panorama we generate 12 overlapping perspective views corresponding to two different elevation angles to capture both the street-level scene and the building fa\c{c}ades, resulting in a total of 24 perspective views each with $90^\circ$ FOV and resolution of $960 \times 720$ pixels.
+		For evaluation we have used two versions of the data. The first one was obtained from the authors of~\cite{Gronat2013} ($25k$ images). In the second version we download additional images and double the dataset size to $55k$ of images. 
+		As a query set with known ground truth GPS positions, we use the 8999 panoramas from the Google Street View research dataset. This dataset covers approximately the same area, but has been captured at a different time, and typically depicts the same places from different viewpoints and under different illumination conditions. For each test panorama, we generate a set of perspective images as described above. Finally, we randomly select out of all generated perspective views a subset of 4k images, which is used as a test set to evaluate the performance of the proposed approach.
+%\vspace{-4mm}
+%		\paragraph{Ground truth:}
+			Since all the query images have associated GPS location we can compute their spatial distance from the database images returned by the matching method. We consider a query image to be correctly localized if its retrieved database image lies within a perimeter of $20m$ from the query image.
 
 
 \begin{figure}[t!]
@@ -578,51 +584,81 @@ the direction of the optimal $w$ will be different from $w^{||}$ and will change
 	%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
    \subsection{Implementation details}
    %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-	   	\paragraph{SIFT features:}
-	   		For all images in turn SIFT local descriptors~\cite{Lowe04} are extracted and subsequently these features are converted to a rootSIFT \cite{Arandjelovic12}. For extraction we use publicly available library {\tt vlfeat}~\cite{vlfeat}.
+      We first extract rootSIFT descriptors~\cite{Arandjelovic12} for each image. %and build
+%   To aggregate the Fisher vector descript of an image we (i) compute the rootSIFTs and perform the PCA decorrelation to $d=64$ space, (ii) use the learned GMM and decorrelated descriptors to compute full FV (iii) project the full FV into lower dimensional spaces, namely to $2^\beta$ where $\beta=7\dots 14$ and (iv) re-normalize projected FVs by operator \eqref{eq:Loperator}.
+	Following~\cite{Jegou12} we first project the 128-dimensional SIFT descriptors to 64 dimensions using PCA. The projection matrix
+	is learnt on a set of descriptors from 5,000 randomly selected database images. This has also the effect of decorrelating the SIFT descriptors. 
+%We first begin with decorrelation of local descriptors. We train a PCA matrix on a set of descriptors of 5,000 randomly selected database images and we project all rootSIFT descriptors into a $d=64$ dimensional space. 
+        The 64-dimensional SIFT descriptors are then aggregated into Fisher vectors using a Gaussian mixture model with $N=256$ components, which 
+        results in a $2\times256\times64 = 32,768$-dimensional descriptor for each image.  
+        The Gaussian mixture model is learnt from descriptors extracted from 5,000 randomly sampled database images. 
+        These high-dimensional descriptors are then projected down to dimension $d\in\{128,512, 2048\}$ using PCA learnt
+        from all available images in the database. 
+        The extracted low dimensional Fisher vectors are then re-normalized to have unit L2-norm, which we found to be important in practice. 
+
+%Then we learn a Gaussian mixture model (GMM) with $N=256$ components.  
+%%Then we learn a generative GMM that consist of $N=256$ components. 
+%We train this model on a another set of (decorrelated) 64-dimensional descriptors from 5,000 randomly selected database images.
+%	    	It follows by learning a PCA for FV decorrelation. The resulting dimension of full FV is $2Nd=32,768$. To learn a reasonable non-singular PCA matrix we need at least this amount of data which we do not have for the first dataset which consists of only 25k images. For both databases we use all available data to train the PCA and we underline that for the first $25k$ dataset the projection to $d'>25k$ is meaningless since the PCA matrix was singular.
+%	    	Finally, to compute the FV of an image we (i) compute the rootSIFTs and perform the PCA decorrelation to $d=64$ space, (ii) use the learned GMM and decorrelated descriptors to compute full FV (iii) project the full FV into lower dimensional spaces, namely to $2^\beta$ where $\beta=7\dots 14$ and (iv) re-normalize projected FVs by operator \eqref{eq:Loperator}.
+
+
+    
+%	   	\paragraph{SIFT features:}
+%	   		For all images in turn SIFT local descriptors~\cite{Lowe04} are extracted and subsequently these features are converted to a rootSIFT \cite{Arandjelovic12}. %For extraction we use publicly available library {\tt vlfeat}~\cite{vlfeat}.
 	    
 	    \vspace{-4mm}
-	   	\paragraph{BOW baseline:}	
-	    	A vocabulary of 100k visual words is learned by approximate k-means clustering~\cite{Philbin07} from a subset of features from 5,000 randomly selected images. A tf-idf~\cite{Sivic2003} vector is computed for each image by assigning each descriptor to the nearest cluster center.  Finally, all tf-idf vectors are normalized to have unit $L_2$ norm.
+	   	\paragraph{Implementation details of the BOW baseline.}	
+		We compare performance to a bag-of-visual-words baseline, where
+	    	a vocabulary of 100k visual words is built by approximate k-means clustering~\cite{Philbin07} from a subset of features from 5,000 randomly selected images. A tf-idf~\cite{Sivic03} vector is computed for each image by assigning each descriptor to the nearest cluster center.  Finally, all tf-idf vectors are normalized to have unit $L_2$ norm.
+
+%	    \vspace{-4mm}
+%	    \paragraph{Fisher vector baseline:}
+%	    	We first begin with decorrelation of local descriptors. We train a PCA matrix on a set of descriptors of 5,000 randomly selected database images and we project all rootSIFT descriptors into a $d=64$ dimensional space. Then we learn a generative GMM that consist of $N=256$ components. We train this model on a set of decorrelated descriptors from 5,000 randomly selected database images.
+%
+%	    	It follows by learning a PCA for FV decorrelation. The resulting dimension of full FV is $2Nd=32,768$. To learn a reasonable non-singular PCA matrix we need at least this amount of data which we do not have for the first dataset which consists of only 25k images. For both databases we use all available data to train the PCA and we underline that for the first $25k$ dataset the projection to $d'>25k$ is meaningless since the PCA matrix was singular.
+%
+%	    	Finally, to compute the FV of an image we (i) compute the rootSIFTs and perform the PCA decorrelation to $d=64$ space, (ii) use the learned GMM and decorrelated descriptors to compute full FV (iii) project the full FV into lower dimensional spaces, namely to $2^\beta$ where $\beta=7\dots 14$ and (iv) re-normalize projected FVs by operator \eqref{eq:Loperator}.
 
 	    \vspace{-4mm}
-	    \paragraph{Fisher vector baseline:}
-	    	We first begin with decorrelation of local descriptors. We train a PCA matrix on a set of descriptors of 5,000 randomly selected database images and we project all rootSIFT descriptors into a $d=64$ dimensional space. Then we learn a generative GMM that consist of $N=256$ components. We train this model on a set of decorrelated descriptors from 5,000 randomly selected database images.
-
-	    	It follows by learning a PCA for FV decorrelation. The resulting dimension of full FV is $2Nd=32,768$. To learn a reasonable non-singular PCA matrix we need at least this amount of data which we do not have for the first dataset which consists of only 25k images. For both databases we use all available data to train the PCA and we underline that for the first $25k$ dataset the projection to $d'>25k$ is meaningless since the PCA matrix was singular.
-
-	    	Finally, to compute the FV of an image we (i) compute the rootSIFTs and perform the PCA decorrelation to $d=64$ space, (ii) use the learned GMM and decorrelated descriptors to compute full FV (iii) project the full FV into lower dimensional spaces, namely to $2^\beta$ where $\beta=7\dots 14$ and (iv) re-normalize projected FVs by operator \eqref{eq:Loperator}.
-
-	    \vspace{-4mm}
-	    \paragraph{Learning vectors:}
-			To learn the linear regressor \eqref{eq:linreg} for database image $j$, the positive and negative training data is constructed as follows. 
+%	    \paragraph{Exemplar SVM learning and  }
+\paragraph{Learning parameters and training data.}
+			To learn the exemplar support vector machine for each database image $j$, the positive and negative training data are constructed as follows. 
 			The \emph{negative training set} $\mathcal N_j$ is obtained by: (i) finding the set of images with geographical distance greater than $200{\rm m}$; (ii)  sorting the images by decreasing value of similarity to image $j$ measured by the dot product between their respective Fisher vectors; (iii) taking the top $N=500$ ranked images as the negative set. 
-			In other words, the negative training data consists of the hard negative images, i.e. those that are very similar to image $j$ but are far away from its geographical position, hence, cannot have the same visual content. The \emph{positive training set} $\mathcal P_j$ consist of the only image $j$ itself.
-
-			For SVM training we use {\tt libsvm} \cite{libsvm} with $L2$ regularizer and $L2$-loss penaty fucntion $h(x)$ from equation \eqref{eq:obj}. To obtain parameters $C_1$ and $C_2$ we perform a grid search and evaluate the performance on held out test set. We observe that for different FV target PCA dimensions the parameter $C_1$ is quite stable (typically $C_1=1$) while the optimal parameter for $C_2$ differs between $10^{-6}$ to $10^{-1}$.
-
-			To learn the new image representation from FVs, for each database image $j$ in turn we (i) learn SVM from $\mathcal P_j$ and $N_j$ (ii) $L2$ normalize learned $w_j$ (iii) use this vector as the new image representation. At query time we compute a FV $\Phi_q$ of the query image and measure its similarity score to each database image by equation \eqref{eq:linreg}.
+			In other words, the negative training data consists of the hard negative images, i.e. those that are similar to image $j$ but are far away from its geographical position, hence, cannot have the same visual content. The \emph{positive training set} $\mathcal P_j$
+			 consist of the original Fisher vector $\Phi_j$ of the image $j$.
+			For the SVM training we use {\tt libsvm} \cite{libsvm}. % with $L2$ regularizer. % and squared hinge loss penalty function $h(x)$ from equation \eqref{
+			 We use the same $C_1$ and $C_2$ parameters for all per-exemplar classifiers, but find the optimal value of the parameters for each dimension of the Fisher vector by grid search evaluating performance on a held out set.
+			 %To obtain parameters $C_1$ and $C_2$  we perform a grid search and evaluate the performance on held out test set. 
+			 We observe that for different Fisher vector target dimensions the optimal value of parameter $C_1$ is quite stable (typically $C_1=1$) while the optimal parameter for $C_2$ varies between $10^{-6}$ to $10^{-1}$.
+			To learn the new image representation for each database image $j$ we: (i) learn SVM from $\mathcal P_j$ and $N_j$ (see above); (ii) $L2$ normalize the learned $w_j$ using equation~\eqref{eq:normalization}; and (iii) use this re-normalized vector as the new image descriptor $\Psi_j$ for image $j$. At query time we compute the Fisher vector $\Phi_q$ of the query image and measure its similarity score to the (newly computed) descriptors each database image by equation~\eqref{eq:class}.
 		
-		\vspace{-4mm}
-		\paragraph{Ground truth:}
-			Since all the query images have associated GPS location we can compute the spatial distance from database image. We consider query image to be correctly localized if its retrieved database image lies within a perimeter of $20m$ from the query image.
-
-
-\paragraph{Negative data:}
-      	The negative training data set contains hard negative examples of the image $j$. These hard negatives are database images that are spatially far-away from image $j$ and, at the same time, have a high similarity score with image $j$ measured by a dot-product of its FVs. This approach follows the simple idea of \cite{Knopp2010} that far-away images do not share the same visual content. A GPS information associated with each database image allows us to construct such a negative set for each image $j$ in turn. Details are provided in experimental section \ref{sec:exp}.
-
-      	The positive training data set is represented by the only image $j$ itself. Why is that? It comes from the nature of the dataset. One could find additional positive examples by taking adjacent panorama images and building a graph where each node represents an image and each edge represents a visual overlap. However, due to the panorama sampling density during the capturing process of the Google Street View it is very rare to detect a visual overlap between two adjacent panoramas. Instead, very often the detected visual overlap is between the images that come from the same panorama and differ by a homography. We found that there is no benefit from taking these images into account.
+		
+%\paragraph{Negative data:}
+%      	The negative training data set contains hard negative examples of the image $j$. These hard negatives are database images that are spatially far-away from image $j$ and, at the same time, have a high similarity score with image $j$ measured by a dot-product of its FVs. This approach follows the simple idea of \cite{Knopp2010} that far-away images do not share the same visual content. A GPS information associated with each database image allows us to construct such a negative set for each image $j$ in turn. Details are provided in experimental section \ref{sec:exp}.
+%
+%      	The positive training data set is represented by the only image $j$ itself. Why is that? It comes from the nature of the dataset. One could find additional positive examples by taking adjacent panorama images and building a graph where each node represents an image and each edge represents a visual overlap. However, due to the panorama sampling density during the capturing process of the Google Street View it is very rare to detect a visual overlap between two adjacent panoramas. Instead, very often the detected visual overlap is between the images that come from the same panorama and differ by a homography. We found that there is no benefit from taking these images into account.
 
 
 
-	\subsection{Results}
-		For each database we compare our results to two baselines: a standard BOW baseline and a Fisher vector baseline. We measure our performance by recall@K metric which is the portion of query images that have at least one relevant image inside its ranked shortlist of the length $K$. We perform our experiments on several target FV dimensions as shown in the figure \ref{fig:recall}.
+	\subsection{Results}		
+		For each database (Pittsburgh 25k and Pittsburgh 55k) we compare results of our method (FV e-SVM) to two baselines: standard BOW baseline (BOW) and a raw Fisher vector matching without any learning (FV). We measure performance by recall@K metric which is the portion of query images that have at least one relevant image inside its ranked shortlist of the length $K$. We perform experiments on several target FV dimensions $d\in\{128,512,2048\}$. For each method we measure performance using the percentage of correctly recognized queries (Recall) similarly to, e.g.~\cite{Chen11,Knopp2010,Sattler-BMVC12}. The query is correctly localized if at least one of the top $K$ retrieved database images is within $20$ meters from the ground truth position of the query. Results are shown for different values of $K$ in table~\ref{tab:recall}. For the Pittsburgh 25k we also show results in the form of a curve in figure~\ref{fig:recall}. 
+		The results clearly demonstrate the benefits of the learnt descriptors with respect to the standard Fisher vectors for all target dimensions and lengths of shortlist $K$. The benefits of discriminative learning are specially prominent for low-dimensional compact descriptors ($d=128$). 
+		 The proposed method also significantly outperforms the bag-of-visual-words baseline. 
+		 Figure~\ref{fig:images} shows examples of place recognition results.	
+		 
+		\paragraph{Memory complexity analysis.}
+		Figure~\ref{fig:memory} compares the performance of the learnt discriminative descriptors (FV-eSVM) to the raw Fisher vectors (FV) for different target dimensions as well as the bag-of-visual-word baseline, clearly demonstrating the benefits of the proposed approach. For example, to achieve accuracy of ***\% percent
+		the proposed method reduces the memory complexity by *** MB, essentially learning a more compact image representation.  
+		
+			
+%		Results  as shown in the figure \ref{fig:recall}.
 
-		It is noticeable that proposed method outperforms all baselines and consistently improves the performance of the original FV over all lengths $K$ of the shortlist and all target FV dimensions. This particularly means that learned descriptors are more likely to attract relevant images into top$K$ shortlist. The results are summarized in table \ref{tab:recall}.
+%		It is noticeable that proposed method outperforms all baselines and consistently improves the performance of the original FV over all lengths $K$ of the shortlist and all target FV dimensions. This particularly means that learned descriptors are more likely to attract relevant images into top$K$ shortlist. The results are summarized in table \ref{tab:recall}.
 
 \begin{table}[t!]
 \begin{centering}
-	\begin{tabularx}{0.94\linewidth}{|c|c c c c c|c c c c c|}
+	\begin{tabularx}{0.94\linewidth}{|l|c c c c c|c c c c c|}
 		\hline 
 		\rowcolor{maroon!50}
 		Method: & \multicolumn{5}{c|}{25k Pittsburgh} & \multicolumn{5}{c|}{55k Pittsburgh} \\
