@@ -65,7 +65,7 @@ Address \\
 \newcommand\sign[1]{\text{sign}\left(#1\right)}
 \newcommand\abs[1]{\left|#1\right|}
 \newcommand\norm[1]{||#1||_2}
-\definecolor{myRed}{HTML}{AA8888}
+\definecolor{myRed}{HTML}{FF3333}
 \definecolor{maroon}{cmyk}{0,0.87,0.68,0.32}
 
 %\nipsfinalcopy % Uncomment for camera-ready version
@@ -299,7 +299,7 @@ The same procedure be potentially applied to other descriptors such as HOG~\cite
 		\subsection{Dimension reduction}
 			The resulted Fisher vector is a high-dimensional representation of an image, which dimensionality depends only on number of $N$ components of the GMM and dimension $d$ of the local image descriptors which is fixed. In practice, the PCA is being used for decorrelation and projection to a lower dimensional space because it subsequently directly affects a size of the indexed signature (see Sec. \ref{sec:overview} and \cite{Jegou2011}).
 
-			We observed that after the PCA decorrelation it is important to $L2$ re-normalize projected FV to achieve better performance. Our interpretation is that after performing the PCA the higher dimensions contain a noise that affects only a magnitude of the projected vectors but not its direction \textcolor{myRed}{Figure or not?}. Furthermore we observed that even slightly better results can be achieved by using the normalization operator \eqref{eq:Loperator} instead of $L2$.
+			We observed that after the PCA decorrelation it is important to $L2$ re-normalize projected FV to achieve better performance. Our interpretation is that after performing the PCA the higher dimensions contain a noise that affects only a magnitude of the projected vectors but not its direction. Furthermore we observed that even slightly better results can be achieved by using the normalization operator \eqref{eq:Loperator} instead of $L2$.
 
 			Finally, it is worth noting that PCA projection into a `not-too-low' dimensional space can actually slightly improve the performance of the full FV. What that `not-too-low' actually means have been partially discussed in \cite{Jegou2012HAL}. However, in general as the dimension decreases the performance of decorrelated FV decrease which is, indeed, what we observe in our experiments. In the next section we therefore aim on enhancing the performance of projected FVs.   
 
@@ -335,7 +335,7 @@ The same procedure be potentially applied to other descriptors such as HOG~\cite
 	  	\end{equation}
 	  	where $\Phi^+_j$ is the descriptor of the place $j$ as a the positive data point, $\Phi$ are Fisher descriptors from negative training data $\mathcal N_j$ and $h$ is the hinge loss. Note that the first term $||w_j||$ is the regularizer, the second term is the loss on the positive data weighted by scalar parameter $C_1$ and the third term is the loss on the negative data weighted by scalar parameter $C_2$. The optimal parameters $w_j$ and $b_j$ can be obtained using standard software packages such as~\cite{libsvm}. A key advantage is that the per-exemplar classifier for each place can be trained independently and hence the learning can be heavily parallelized. On the downside, as the individual per-location classifiers are trained independently the resulting scores have to be calibrated with respect to each other on additional data~\cite{Gronat13,Malisiewicz11}.
 
-In the following section, we analyze the exemplar SVM objective~(\ref{eq:obj}) and show the learnt weight vector $w_j$ can be interpreted as 
+In the following section, we analyze the exemplar SVM objective~(\ref{eq:obj}) and show the learnt \textcolor{myRed}{and re-normalized} weight vector $w_j$ can be interpreted as 
 a new descriptor $\Psi_j$.  In particular, when the weight $C_2$ of the negative data in objective~(\ref{eq:obj}) goes to zero the $\Psi_j$ is going to be identical to original $\Phi_j^+$.  As $C_2$ increases $\Psi_j$ goes away from $\Phi_j^+$ such that the measured distance between $\Psi_j$ and negative examples increases.
 Details are given next.
 
@@ -367,8 +367,11 @@ Details are given next.
 %	  	where $\Phi^+_j$ is a single positive exemplar, $\Phi$ are FVs from negative training data $\mathcal N_j$, $||w_j||$ is a regularization term, $h$ is a penalty function and $C_1$, $C_2$ are penalty weights for positive or negative data. This objective is being minimized in $w_j$ and $b_j$. In the section below will show that the new descriptor $\Psi_j$ can be interpreted as unit normal of the learned hyperplane $w_j$ and we will show that when $C_2$ in equation~(\ref{eq:obj}) goes to zero the new descriptor $\Psi_j$ is going to be identical to original $\Phi_j^+$, as $C_2$ increases $\Psi_j$ declines from $\Phi_j^+$ such that the measured distance between $\Psi_j$ and negative examples increases.
 %	
 	
-	\subsection*{Analysis of per-exemplar SVM objective} \vspace{-0.2cm} 		
-		We will analyze behavior of the objective \eqref{eq:obj} and show that in a limit case the vector $w_j$ is parallel to single positive data $\Phi_j^+$. First, let us decompose $w_j$ into parallel and orthogonal part w.r.t. $\Phi^+$ and then let $C_2\rightarrow 0$ and analyze the behavior of the convex objective. After decomposition of $w_j$ such that $w_j=w_j^{\perp}+w_j^{||}$ the convex objective can be re-written as follows
+	\subsection*{Analysis of per-exemplar SVM objective} \vspace{-0.2cm} 
+
+        The goal is to show that the limit case behavior of the e-SVM objective \eqref{eq:obj} is such that as $C_2$ goes to zero the resulting hyperplane vector $w_j$ is parallel with the training descriptor $\Phi_j^+$ and if $w_j$ is normalized these vectors are identical.
+
+		First, let us decompose $w_j$ into parallel and orthogonal part w.r.t. $\Phi^+$. Second, let $C_2\rightarrow 0$ and analyze the behavior of the objective. After the decomposition of $w_j$ such that $w_j=w_j^{\perp}+w_j^{||}$ the convex objective can be re-written as follows
 
 	  	\begin{align}
 	  		\nonumber
