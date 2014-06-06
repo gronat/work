@@ -317,9 +317,9 @@ The same procedure be potentially applied to other descriptors such as HOG~\cite
 %	Note that both the query and database vectors are L2 normalized and hence the dot product measures the cosine of   
 	In other words, the aim is to replace each original database Fisher vector $\Phi_j$ with a new vector $\Psi_j$ that is more discriminative in the sense of separation from descriptors of images depicting other places. 
 	Inspired by~\cite{Gronat2013} we investigate applying the exemplar support vector machine (e-SVM)~\cite{} for this task. 
-	e-SVM learns a linear classifier $w_j^T\Phi+b_j$ given the descriptor of place $j$ as a single positive example $\Phi_j^+$ and a large number of negative data $\mathcal N_j$ from other places in the database.
+	e-SVM learns a linear classifier $w_j^T\Phi+b_j$ given the descriptor $\Phi_j^+$ of place $j$ as a single positive example (with target label +1) and a large number of negative descriptors $\mathcal N_j$ from other places in the database (with target labels -1).
 	The intuition is that the resulting weight $w_j$ vector will give a higher weight to the dimensions of the descriptor that are discriminative and will down-weight dimensions that are non-discriminative with respect to the negative training data collected from other far-away places.  The optimal $w_j$ and $b_j$ are obtained
-	by minimizing the following convex objective  
+	by minimizing the following objective  
 %	The vector should have a unit $L2$-norm in order to measure the distance by a dot-product in equation \eqref{eq:class}. 
 %	In the following we analyze a limit behavior of per-exemplar SVM convex objective and show that learned hyperplane normal can be interpreted as a new descriptor that increases the measured distance from negative data.
         \begin{equation}
@@ -333,12 +333,18 @@ The same procedure be potentially applied to other descriptors such as HOG~\cite
 	                         \right), 	
 	       	\label{eq:obj} 
 	  	\end{equation}
+	  	where $\Phi^+_j$ is the descriptor of the place $j$ as the positive data point, $\Phi$ are Fisher descriptors from negative training data $\mathcal N_j$ and $h$ is the hinge loss, $h(y) = \max(1-y,0)$. Note that the first term in~(\ref{eq:obj}) is the regularizer, the second term is the loss on the positive data weighted by scalar parameter $C_1$ and the third term is the loss on the negative data weighted by scalar parameter $C_2$. The objective is convex and can be minimized with respect to $w_j$ and $b_j$ using standard software packages such as~\cite{libsvm}. A key advantage is that the per-exemplar classifier for each place can be trained independently and hence the learning can be heavily parallelized. The downside of the independent training for each positive example is that the resulting scores have to be calibrated with respect to each other on additional data~\cite{Gronat13,Malisiewicz11}.
 
-	  	where $\Phi^+_j$ is the descriptor of the place $j$ as a the positive data point, $\Phi$ are Fisher descriptors from negative training data $\mathcal N_j$ and $h$ is the hinge loss. Note that the first term $||w_j||$ is the regularizer, the second term is the loss on the positive data weighted by scalar parameter $C_1$ and the third term is the loss on the negative data weighted by scalar parameter $C_2$. The optimal parameters $w_j$ and $b_j$ can be obtained using standard software packages such as~\cite{libsvm}. A key advantage is that the per-exemplar classifier for each place can be trained independently and hence the learning can be heavily parallelized. On the downside, as the individual per-location classifiers are trained independently the resulting scores have to be calibrated with respect to each other on additional data~\cite{Gronat13,Malisiewicz11}.
-
-        In the following section, we analyze the exemplar SVM objective~(\ref{eq:obj}) and show the learnt \textcolor{myRed}{and re-normalized} weight vector $w_j$ can be interpreted as 
-        a new descriptor $\Psi_j$.  In particular, when the weight $C_2$ of the negative data in objective~(\ref{eq:obj}) goes to zero the $\Psi_j$ is going to be identical to original $\Phi_j^+$.  As $C_2$ increases $\Psi_j$ goes away from $\Phi_j^+$ such that the measured distance between $\Psi_j$ and negative examples increases.
-        Details are given next.
+%In the following section, we analyze the exemplar SVM objective~(\ref{eq:obj}) and show the learnt and {\em re-normalized} weight vector $w_j$ can be interpreted as 
+%a new descriptor $\Psi_j$ that replaces the original positive training descriptor $\Phi^+_j$.  In particular, we show first that when the weight $C_2$ of the negative data in objective~(\ref{eq:obj}) goes to zero the learnt $\Psi_j$ is identical to the original positive training data point $\Phi_j^+$.  Second, when $C_2>0$, the learnt $\Psi_j$ moves away from the positive $\Phi_j^+$ to increase its separation from the negative data. %such that the measured distance between $\Psi_j$ and negative examples increases.
+%Details are given next.
+%
+%	  	where $\Phi^+_j$ is the descriptor of the place $j$ as a the positive data point, $\Phi$ are Fisher descriptors from negative training data $\mathcal N_j$ and $h$ is the hinge loss. Note that the first term $||w_j||$ is the regularizer, the second term is the loss on the positive data weighted by scalar parameter $C_1$ and the third term is the loss on the negative data weighted by scalar parameter $C_2$. The optimal parameters $w_j$ and $b_j$ can be obtained using standard software packages such as~\cite{libsvm}. A key advantage is that the per-exemplar classifier for each place can be trained independently and hence the learning can be heavily parallelized. On the downside, as the individual per-location classifiers are trained independently the resulting scores have to be calibrated with respect to each other on additional data~\cite{Gronat13,Malisiewicz11}.
+%
+%        In the following section, we analyze the exemplar SVM objective~(\ref{eq:obj}) and show the learnt \textcolor{myRed}{and re-normalized} weight vector $w_j$ can be interpreted as 
+%        a new descriptor $\Psi_j$.  In particular, when the weight $C_2$ of the negative data in objective~(\ref{eq:obj}) goes to zero the $\Psi_j$ is going to be identical to original $\Phi_j^+$.  As $C_2$ increases $\Psi_j$ goes away from $\Phi_j^+$ such that the measured distance between $\Psi_j$ and negative examples increases.
+%        Details are given next.
+%>>>>>>> FETCH_HEAD
 
 % for c2->0, w_j is parallel with Phi+
 % for c2>0 the direction of  w_j changes such as the dot-product is maximied
@@ -370,97 +376,153 @@ The same procedure be potentially applied to other descriptors such as HOG~\cite
 	
 	\subsection*{Analysis of per-exemplar SVM objective} \vspace{-0.2cm} 
 
-        The goal is to show that the limit case behavior of the e-SVM objective \eqref{eq:obj} is such that as $C_2$ goes to zero the resulting hyperplane vector $w_j$ is parallel with the training descriptor $\Phi_j^+$. Moreover, if $w_j$ is normalized these vectors are identical.
+In this section, we analyze the exemplar SVM objective~(\ref{eq:obj}) and show the learnt and {\em re-normalized} weight vector $w_j$ can be interpreted as 
+a new descriptor $\Psi_j$ that replaces the original positive training descriptor $\Phi^+_j$.  In particular, we show first that when the weight $C_2$ of the negative data in objective~(\ref{eq:obj}) goes to zero the learnt $\Psi_j$ is identical to the original positive training data point $\Phi_j^+$.  Second, when $C_2>0$, the learnt $\Psi_j$ moves away from the positive $\Phi_j^+$ to increase its separation from the negative data. %such that the measured distance between $\Psi_j$ and negative examples increases.
+Details are given next.
 
-		First, let us decompose $w_j$ into parallel and orthogonal part w.r.t. $\Phi^+$. Second, let $C_2\rightarrow 0$ and analyze the behavior of the objective. After the decomposition of $w_j$ such that $w_j=w_j^{\perp}+w_j^{||}$ the convex objective can be re-written as follows
 
+%=======
+%        The goal is to show that the limit case behavior of the e-SVM objective \eqref{eq:obj} is such that as $C_2$ goes to zero the resulting hyperplane vector $w_j$ is parallel with the training descriptor $\Phi_j^+$. Moreover, if $w_j$ is normalized these vectors are identical.
+%>>>>>>> FETCH_HEAD
+
+\paragraph{Case I: $C_2\rightarrow 0$.}
+%The goal is to show that in the limit case behavior of the e-SVM objective \eqref{eq:obj} is such that as $C_2$ goes to zero the resulting hyperplane vector $w_j$ is parallel with the training descriptor $\Phi_j^+$ and if $w_j$ is normalized these vectors are identical.
+The goal is to show that when the weight  $C_2$ of the negative data in objective~\eqref{eq:obj} goes towards zero the resulting hyperplane vector $w_j$ is parallel with the positive training descriptor $\Phi_j^+$ and when $w_j$ is normalized to have unit L2 norm the two vectors are identical.
+		First, let us decompose $w$ into parallel and orthogonal part with respect to the positive training data point $\Phi^+$ (in the following we omit index $j$ for brevity), i.e.\
+$w=w^{\perp}+w^{||}$, where $(w^{\perp})^T \Phi^+ = 0$. Next, we observe that when the weight of the negative data diminishes ($C_2\rightarrow 0$), any non-zero component $w^{\perp}$ will increase the value of the objective. As a result, for $C_2\rightarrow 0$ the objective is minimized by $w^{||}$, i.e.\ the optimal $w$ is parallel with $\Phi^+$. %This can be shown by as follows.
+ 
+%		 Second, we let the weight of negative data go to zero $C_2\rightarrow 0$ and show that in this case 		
+%		 After the decomposition of $w_j$ such that $w_j=w_j^{\perp}+w_j^{||}$ the convex objective can be re-written as follows\
+In detail, for $w=w^{\perp}+w^{||}$ the objective~(\ref{eq:obj}) can be written as
 	  	\begin{equation}
-	  		\nonumber
-	        ||w_j^{\perp}+w_j^{||}||^{2} +
+	        ||w^{\perp}+w^{||}||^{2} +
 	        C_1 \cdot h
 	        \left(
-	        	(w_j^{\perp}+w_j^{||})^T\Phi^+_j+b_j
+	        	(w^{\perp}+w^{||})^T\Phi^+ + b
 	        \right)+
-	        C_2\sum_{\Phi\in \mathcal N_j} h
+	        C_2\sum_{\Phi\in \mathcal N} h
 	        \left(
-	        	-(w_j^{\perp}+w_j^{||})^T\Phi-b_j
-	        \right)
+	        	-(w^{\perp}+w^{||})^T\Phi-b
+	        \right).
             \label{eq:decomposedOrig}
 	   \end{equation}
-
-	  	Notice that in the second term the orthogonal part does not change the value of a dot-product since $(w_j^{\perp}+w_j^{||})\Phi^+=w_j^{||}\Phi^+$, hence the equation \eqref{eq:decomposedOrig} becomes
-
+	  	Note that the orthogonal part $w^{\perp}$ does not change the value of  the second term in~(\ref{eq:decomposedOrig}) because $(w^{\perp}+w^{||})^T\Phi^+=(w^{||})^T\Phi^+$, and hence~(\ref{eq:decomposedOrig}) reduces to
         \begin{equation} 
-            ||w_j^{\perp}+w_j^{||}||^{2} +
+            ||w^{\perp}+w^{||}||^{2} +
             C_1 \cdot h
             \left(
-                w_j^{||T}\Phi^+_j+b_j
+                w^{||T}\Phi^+ +b_j
             \right)+
-            C_2\sum_{\Phi\in \mathcal N_j} h
+            C_2\sum_{\Phi\in \mathcal N} h
             \left(
-                -(w_j^{\perp}+w_j^{||})^T\Phi-b_j
-            \right) 
+                -(w^{\perp}+w^{||})^T\Phi-b
+            \right).
             \label{eq:decomposed} 
         \end{equation}  
+        	In the limit case as $C_2 \rightarrow 0$ any non-zero component $w^{\perp}$
+	will increase the value of the objective~\eqref{eq:decomposed}. 
+	This can be seen by noting that the third term vanishes when $C_2 \rightarrow 0$ and hence the objective is dominated by the first two terms. Further,  	
+	the second term in~\eqref{eq:decomposed} is independent of $w^{\perp}$. Finally, the third term will always increase for any non-zero value of $w^{\perp}$ as 
+        $||w^{\perp}+w^{||}||^{2} \geq ||w^{||}||$ for any $w^{\perp}\neq0$.
+		             
+%	 % where the first two terms dominate.	
+%	This can be seen by writing the first two terms of objective~\eqref{eq:decomposed} %Without the the third term the objective can be written as 
+%%         Because $C_2 \rightarrow 0$ the first two terms dominate the equation \eqref{eq:decomposed} thus in the limit case it follows that
+%		  	\begin{align}
+%      %           \nonumber
+%		  		% ||w_j||^2 +C_1 \cdot 
+%		    %     h
+%		    %     \left(
+%		    %     	w_j^T\Phi^+_j+b_j
+%		    %     \right)&=\\
+%		        ||w^{\perp}+w_j^{||}||^{2} +
+%		        C_1 \cdot h
+%		        \left(
+%		        	w_j^{||T}\Phi^+_j+b_j
+%		        \right)
+%		        &\geq
+%		        ||w_j^{||}||^2 +C_1 \cdot 
+%		        h
+%		        \left(
+%		        	w_j^{||T}\Phi^+_j+b_j
+%		        \right)
+%		       	\label{eq:bound} 
+%		  	\end{align}
 
-         Because $C_2 \rightarrow 0$ the first two terms dominate the equation \eqref{eq:decomposed} thus in the limit case it follows that
+As a result, in the limit case when $C_2 \rightarrow 0$ the optimal $w$ is parallel with $\Phi^+$. 
+%\paragraph{Case II: $C_2=0$.}
+Note also, that when $C_2$ is exactly equal to zero, $C_2=0$, the optimal $w$ vanishes, i.e. the objective~\eqref{eq:decomposed} is minimized by trivial solution $||w||=0$ and $b_j=-1$. 
+The effect of decreasing the parameter $C_2$ is illustrated in figure~\ref{fig:C2effect}.
 
-		  	\begin{align}
-      %           \nonumber
-		  		% ||w_j||^2 +C_1 \cdot 
-		    %     h
-		    %     \left(
-		    %     	w_j^T\Phi^+_j+b_j
-		    %     \right)&=\\
-		        ||w_j^{\perp}+w_j^{||}||^{2} +
-		        C_1 \cdot h
-		        \left(
-		        	w_j^{||T}\Phi^+_j+b_j
-		        \right)
-		        &\geq
-		        ||w_j^{||}||^2 +C_1 \cdot 
-		        h
-		        \left(
-		        	w_j^{||T}\Phi^+_j+b_j
-		        \right)
-		       	\label{eq:bound} 
-		  	\end{align}
 
-		The inequality \eqref{eq:bound} can be interpreted such that in the limit case, for arbitrary vector $w_j$, it's parallel part always minimizes the objective. Hence, the in the limit case the $w_j$ converges to be parallel with $\Phi^+$. Also notice, that for $C_2=0$ the solution is unique such that $||w_j||=0$ and $b_j=-1$. The effect of decreasing the parameter $C_2$ is illustrated in figure \ref{fig:C2effect}.
+%	The inequality \eqref{eq:bound} can be interpreted such that in the limit case, for arbitrary vector $w_j$, it's parallel part always minimizes the objective. Hence, the in the limit case the $w_j$ converges to be parallel with $\Phi^+$. Also notice, that for $C_2=0$ the solution is unique such that $||w_j||=0$ and $b_j=-1$. The effect of decreasing the parameter $C_2$ is illustrated in figure \ref{fig:C2effect}.
 
+\paragraph{Case II: $C_2>0$.}
+
+When the weight $C_2$ of the negative data in the objective~\eqref{eq:decomposed} increases
+the direction of the optimal $w$ will be different from $w^{||}$ and will change 
+ to take into account the loss on the negative data points. Explicitly writing the hinge-loss $h(x) = \max(1-x,0)$ in 
+ the last term of~\eqref{eq:decomposed}, we see that $w$ will move in the direction
+ that reduces $\sum_{\Phi\in \mathcal N}\max \left(1+w^T \Phi + b ,0 \right)$, i.e.\ that reduces the dot product
+ $w^T \Phi$ on the negative examples that are active (support vectors).
+ 
+  
+%$\sum_{\Phi\in \mathcal N} h\left(-w^T \Phi - b \right).$ In the case of hinge loss $h(x) = \max(1-x,0)$, the
+%objective penalizes $\max \left(1+w^T \Phi + b ,0 \right)$ on each negative datapoint. 
+
+%$\sum_{\Phi\in \mathcal N} h\left(-w^T \Phi - b \right).$
+%\sum_{\Phi\in \mathcal N} h\left(-w^T \Phi - b \right) $.
+ 
+
+% when C2 >0 the direction of optimal w will be different from w in such a way to take into account the loss
+% on the negative data points. 
+
+% $||w^{||}$ as the loss on negative data points penalizes 
+
+
+%is going to be moved from the $ 
+% objective is minimized for 
+%For non-zero $C_2$ is positivie.
+%The effect of decreasing the parameter $C_2$ is illustrated in figure \ref{fig:C2effect}.
+
+
+	
 \begin{figure}[t]
     \begin{center}
-        \subfigure[]{
+        \subfigure[$C_2>0$ ]{
             \centering
             \includegraphics[width=0.35\linewidth]{imgs/figSVM01tight}
         }
-        $C_2 \rightarrow 0$
-        \subfigure[]{
+%        $C_2 \rightarrow 0$
+        \subfigure[$C_2 \rightarrow 0$]{
             \centering
             \includegraphics[width=0.35\linewidth]{imgs/figSVM02tight}
         }
-    \caption{An illustration of the effect of decreasing a parameter $C_2$. As the paramterer $C_2$ decreases the resulting vector $w_j$ is being parallel to $\Phi_j^+$. Re-normalized $w_j$ is then identical with original positive vector.}
+    \caption{{\bf An illustration of the effect of decreasing parameter $C_2$ in the exemplar support vector machine objective.} The positive exemplar $\Phi_j^+$ is shown in green. The negative data points are shown in red. All training data is L2 normalized to lie on a hyper-sphere. (a) For $C_2>0$, the normal $w_j$ of the optimal hyper-plane moves away from the direction given by the positive example $\Phi^+$ in a manner that reduces the loss on the negative data.  (b) As the parameter $C_2$ decreases the learnt $w_j$ becomes parallel to the positive training example $\Phi_j^+$ and its magnitude $||w_j||$ goes to 0.}
     \label{fig:C2effect}
     \end{center}
 \end{figure}
 
-	\subsection*{Interpretation, re-normalization} \vspace{-0.2cm}
-	  	The result above shows that as $C_2$ decreases the normal of the hyperplane that separates the positive exemplar from negative data tends to be parallel with $\Phi^+$ as shown in figure \ref{fig:C2effect}. As $C_2$ grows, this normal declines such that distance from the negative data increases.
-
-		Since FVs are $L2$ normalized our goal is to measure the similarity between two descriptors by an angle, equation \eqref{eq:class}, hence we interpret the new descriptor $\Psi_j$ as a normalized hyperplane normal such that
-
+	\subsection*{Interpreting normalized $w$ as a new descriptor} \vspace{-0.2cm}	
+	  	The above analysis demonstrates that as $C_2$ decreases the normal of the optimal hyperplane $w$ that separates the positive exemplar $\Phi^+$ from negative data becomes parallel with $\Phi^+$, as shown in figure \ref{fig:C2effect}. As $C_2$ increases, the normal $w$ of the optimal hyper-plane moves away from the direction given by the positive example $\Phi^+$ in a manner that reduces the loss on the negative data. 
+%		In other words, the weight $C_2$ determines the amount of  of information about discriminative and informative dimensions in the new descriptor $\Psi_j$.
+		This suggests that the learnt $w$ could be interpreted as a modified positive example $\Phi^+$, re-weighted to emphasize directions that separate $\Phi^+$ from the negative data.   
+%		Based on this analysis we interpret the learnt $w$ as a new descriptor     
+	       As discussed above $w$ is not normalized. As we wish to measure the similarity between descriptors by (the cosine of) their angle        
+	  given by equation \eqref{eq:class}, additional normalization of the learnt $w$ is necessary.
+	      Hence we define the new descriptor $\Psi_j$ as the normalized hyperplane normal $w_j$
 		  	\begin{equation}
-		  		\Psi_j=\dfrac{w_j}{||w_j||}
+		  		\Psi_j=\dfrac{w_j}{||w_j||}.
 		  	\end{equation}
 
-        Notice that as $C_2$ goes to zero, the vector $\Psi_j$ becomes to be original Fisher vector $\Phi_j^+$. When $C_2$ increases the penalty term for negative data declines the vector in such way that negative training data are better separated. Loosely speaking, $C_2$ designates amount of information about discriminative and informative dimensions in the new descriptor $\Psi_j$.
+%        Notice that as $C_2$ goes to zero, the vector $\Psi_j$ becomes to be original Fisher vector $\Phi_j^+$. When $C_2$ increases the penalty term for negative data declines the vector in such way that negative training data are better separated. Loosely speaking, $C_2$ designates amount of information about discriminative and informative dimensions in the new descriptor $\Psi_j$.
 
 
-
-    \subsection{Training data}
-      	The negative training data set contains hard negative examples of the image $j$. These hard negatives are database images that are spatially far-away from image $j$ and, at the same time, have a high similarity score with image $j$ measured by a dot-product of its FVs. This approach follows the simple idea of \cite{Knopp2010} that far-away images do not share the same visual content. A GPS information associated with each database image allows us to construct such a negative set for each image $j$ in turn. Details are provided in experimental section \ref{sec:exp}.
-
-      	The positive training data set is represented by the only image $j$ itself. Why is that? It comes from the nature of the dataset. One could find additional positive examples by taking adjacent panorama images and building a graph where each node represents an image and each edge represents a visual overlap. However, due to the panorama sampling density during the capturing process of the Google Street View it is very rare to detect a visual overlap between two adjacent panoramas. Instead, very often the detected visual overlap is between the images that come from the same panorama and differ by a homography. We found that there is no benefit from taking these images into account.
+%
+%    \subsection{Training data}
+%      	The negative training data set contains hard negative examples of the image $j$. These hard negatives are database images that are spatially far-away from image $j$ and, at the same time, have a high similarity score with image $j$ measured by a dot-product of its FVs. This approach follows the simple idea of \cite{Knopp2010} that far-away images do not share the same visual content. A GPS information associated with each database image allows us to construct such a negative set for each image $j$ in turn. Details are provided in experimental section \ref{sec:exp}.
+%
+%      	The positive training data set is represented by the only image $j$ itself. Why is that? It comes from the nature of the dataset. One could find additional positive examples by taking adjacent panorama images and building a graph where each node represents an image and each edge represents a visual overlap. However, due to the panorama sampling density during the capturing process of the Google Street View it is very rare to detect a visual overlap between two adjacent panoramas. Instead, very often the detected visual overlap is between the images that come from the same panorama and differ by a homography. We found that there is no benefit from taking these images into account.
 
 % \section{Why does exemplar-SVM works}
 %   	The convex objective \eqref{eq:obj} consist of regularization term a two penalty terms with weights $C_1$ and $C_2$. We will show that if $C_2 \rightarrow 0$ the resulting $w_j$ is going to be parallel with $\Phi_j^+$, hence $\Psi_j \rightarrow \Phi^+_j$.
@@ -544,6 +606,13 @@ The same procedure be potentially applied to other descriptors such as HOG~\cite
 		\vspace{-4mm}
 		\paragraph{Ground truth:}
 			Since all the query images have associated GPS location we can compute the spatial distance from database image. We consider query image to be correctly localized if its retrieved database image lies within a perimeter of $20m$ from the query image.
+
+
+\paragraph{Negative data:}
+      	The negative training data set contains hard negative examples of the image $j$. These hard negatives are database images that are spatially far-away from image $j$ and, at the same time, have a high similarity score with image $j$ measured by a dot-product of its FVs. This approach follows the simple idea of \cite{Knopp2010} that far-away images do not share the same visual content. A GPS information associated with each database image allows us to construct such a negative set for each image $j$ in turn. Details are provided in experimental section \ref{sec:exp}.
+
+      	The positive training data set is represented by the only image $j$ itself. Why is that? It comes from the nature of the dataset. One could find additional positive examples by taking adjacent panorama images and building a graph where each node represents an image and each edge represents a visual overlap. However, due to the panorama sampling density during the capturing process of the Google Street View it is very rare to detect a visual overlap between two adjacent panoramas. Instead, very often the detected visual overlap is between the images that come from the same panorama and differ by a homography. We found that there is no benefit from taking these images into account.
+
 
 
 	\subsection{Results}
