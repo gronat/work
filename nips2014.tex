@@ -322,7 +322,7 @@ The same procedure be potentially applied to other descriptors such as HOG~\cite
 	by minimizing the following convex objective  
 %	The vector should have a unit $L2$-norm in order to measure the distance by a dot-product in equation \eqref{eq:class}. 
 %	In the following we analyze a limit behavior of per-exemplar SVM convex objective and show that learned hyperplane normal can be interpreted as a new descriptor that increases the measured distance from negative data.
-\begin{equation}
+        \begin{equation}
 	        ||w_j||^{2} +C_1 \cdot h
 	        				\left(
 	        				w_j^T\Phi^+_j+b_j
@@ -333,11 +333,12 @@ The same procedure be potentially applied to other descriptors such as HOG~\cite
 	                         \right), 	
 	       	\label{eq:obj} 
 	  	\end{equation}
+
 	  	where $\Phi^+_j$ is the descriptor of the place $j$ as a the positive data point, $\Phi$ are Fisher descriptors from negative training data $\mathcal N_j$ and $h$ is the hinge loss. Note that the first term $||w_j||$ is the regularizer, the second term is the loss on the positive data weighted by scalar parameter $C_1$ and the third term is the loss on the negative data weighted by scalar parameter $C_2$. The optimal parameters $w_j$ and $b_j$ can be obtained using standard software packages such as~\cite{libsvm}. A key advantage is that the per-exemplar classifier for each place can be trained independently and hence the learning can be heavily parallelized. On the downside, as the individual per-location classifiers are trained independently the resulting scores have to be calibrated with respect to each other on additional data~\cite{Gronat13,Malisiewicz11}.
 
-In the following section, we analyze the exemplar SVM objective~(\ref{eq:obj}) and show the learnt \textcolor{myRed}{and re-normalized} weight vector $w_j$ can be interpreted as 
-a new descriptor $\Psi_j$.  In particular, when the weight $C_2$ of the negative data in objective~(\ref{eq:obj}) goes to zero the $\Psi_j$ is going to be identical to original $\Phi_j^+$.  As $C_2$ increases $\Psi_j$ goes away from $\Phi_j^+$ such that the measured distance between $\Psi_j$ and negative examples increases.
-Details are given next.
+        In the following section, we analyze the exemplar SVM objective~(\ref{eq:obj}) and show the learnt \textcolor{myRed}{and re-normalized} weight vector $w_j$ can be interpreted as 
+        a new descriptor $\Psi_j$.  In particular, when the weight $C_2$ of the negative data in objective~(\ref{eq:obj}) goes to zero the $\Psi_j$ is going to be identical to original $\Phi_j^+$.  As $C_2$ increases $\Psi_j$ goes away from $\Phi_j^+$ such that the measured distance between $\Psi_j$ and negative examples increases.
+        Details are given next.
 
 % for c2->0, w_j is parallel with Phi+
 % for c2>0 the direction of  w_j changes such as the dot-product is maximied
@@ -369,13 +370,13 @@ Details are given next.
 	
 	\subsection*{Analysis of per-exemplar SVM objective} \vspace{-0.2cm} 
 
-        The goal is to show that the limit case behavior of the e-SVM objective \eqref{eq:obj} is such that as $C_2$ goes to zero the resulting hyperplane vector $w_j$ is parallel with the training descriptor $\Phi_j^+$ and if $w_j$ is normalized these vectors are identical.
+        The goal is to show that the limit case behavior of the e-SVM objective \eqref{eq:obj} is such that as $C_2$ goes to zero the resulting hyperplane vector $w_j$ is parallel with the training descriptor $\Phi_j^+$. Moreover, if $w_j$ is normalized these vectors are identical.
 
 		First, let us decompose $w_j$ into parallel and orthogonal part w.r.t. $\Phi^+$. Second, let $C_2\rightarrow 0$ and analyze the behavior of the objective. After the decomposition of $w_j$ such that $w_j=w_j^{\perp}+w_j^{||}$ the convex objective can be re-written as follows
 
-	  	\begin{align}
+	  	\begin{equation}
 	  		\nonumber
-	        ||w_j^{\perp}+w_j^{||}||^{2} +&
+	        ||w_j^{\perp}+w_j^{||}||^{2} +
 	        C_1 \cdot h
 	        \left(
 	        	(w_j^{\perp}+w_j^{||})^T\Phi^+_j+b_j
@@ -384,29 +385,34 @@ Details are given next.
 	        \left(
 	        	-(w_j^{\perp}+w_j^{||})^T\Phi-b_j
 	        \right)
-	        = \\ 
-	        ||w_j^{\perp}+w_j^{||}||^{2} +&
-	        C_1 \cdot h
-	        \left(
-	        	w_j^{||T}\Phi^+_j+b_j
-	        \right)+
-	        C_2\sum_{\Phi\in \mathcal N_j} h
-	        \left(
-	        	-(w_j^{\perp}+w_j^{||})^T\Phi-b_j
-	        \right)	
-	       	\label{eq:decomposed} 
-	  	\end{align}	
+            \label{eq:decomposedOrig}
+	   \end{equation}
 
-	  	Notice that in the second term the orthogonal part does not change the value of a dot-product since $(w_j^{\perp}+w_j^{||})\Phi^+=w_j^{||}\Phi^+$. Because $C_2 \rightarrow 0$ the first two terms dominate the equation \eqref{eq:decomposed} thus in the limit case it follows that
+	  	Notice that in the second term the orthogonal part does not change the value of a dot-product since $(w_j^{\perp}+w_j^{||})\Phi^+=w_j^{||}\Phi^+$, hence the equation \eqref{eq:decomposedOrig} becomes
+
+        \begin{equation} 
+            ||w_j^{\perp}+w_j^{||}||^{2} +
+            C_1 \cdot h
+            \left(
+                w_j^{||T}\Phi^+_j+b_j
+            \right)+
+            C_2\sum_{\Phi\in \mathcal N_j} h
+            \left(
+                -(w_j^{\perp}+w_j^{||})^T\Phi-b_j
+            \right) 
+            \label{eq:decomposed} 
+        \end{equation}  
+
+         Because $C_2 \rightarrow 0$ the first two terms dominate the equation \eqref{eq:decomposed} thus in the limit case it follows that
 
 		  	\begin{align}
-                \nonumber
-		  		||w_j||^2 +C_1 \cdot 
-		        h
-		        \left(
-		        	w_j^T\Phi^+_j+b_j
-		        \right)&=\\
-		        =||w_j^{\perp}+w_j^{||}||^{2} +
+      %           \nonumber
+		  		% ||w_j||^2 +C_1 \cdot 
+		    %     h
+		    %     \left(
+		    %     	w_j^T\Phi^+_j+b_j
+		    %     \right)&=\\
+		        ||w_j^{\perp}+w_j^{||}||^{2} +
 		        C_1 \cdot h
 		        \left(
 		        	w_j^{||T}\Phi^+_j+b_j
@@ -420,34 +426,34 @@ Details are given next.
 		       	\label{eq:bound} 
 		  	\end{align}
 
+		The inequality \eqref{eq:bound} can be interpreted such that in the limit case, for arbitrary vector $w_j$, it's parallel part always minimizes the objective. Hence, the in the limit case the $w_j$ converges to be parallel with $\Phi^+$. Also notice, that for $C_2=0$ the solution is unique such that $||w_j||=0$ and $b_j=-1$. The effect of decreasing the parameter $C_2$ is illustrated in figure \ref{fig:C2effect}.
 
-			\begin{figure}[t]
-			    \begin{center}
-				    \subfigure[]{
-				        \centering
-                        \includegraphics[width=0.35\linewidth]{imgs/figSVM01tight}
-				    }
-                    $C_2 \rightarrow 0$
-				    \subfigure[]{
-				        \centering
-                        \includegraphics[width=0.35\linewidth]{imgs/figSVM02tight}
-				    }
-			    \caption{An illustration of the effect of decreasing a parameter $C_2$. As the paramterer $C_2$ decreases the resulting vector $w_j$ is being parallel to $\Phi_j^+$. Re-normalized $w_j$ is then identical with original positive vector.}
-			    \label{fig:C2effect}
-                \end{center}
-			\end{figure}
-
-		As a conclusion, we have shown that when $C_2$ is close to zero the hyperplane $w_j$ is parallel to original $\Phi^+$, when $C_2$ increases $w_j$ declines from direciton of $\Phi^+$. 
+\begin{figure}[t]
+    \begin{center}
+        \subfigure[]{
+            \centering
+            \includegraphics[width=0.35\linewidth]{imgs/figSVM01tight}
+        }
+        $C_2 \rightarrow 0$
+        \subfigure[]{
+            \centering
+            \includegraphics[width=0.35\linewidth]{imgs/figSVM02tight}
+        }
+    \caption{An illustration of the effect of decreasing a parameter $C_2$. As the paramterer $C_2$ decreases the resulting vector $w_j$ is being parallel to $\Phi_j^+$. Re-normalized $w_j$ is then identical with original positive vector.}
+    \label{fig:C2effect}
+    \end{center}
+\end{figure}
 
 	\subsection*{Interpretation, re-normalization} \vspace{-0.2cm}
 	  	The result above shows that as $C_2$ decreases the normal of the hyperplane that separates the positive exemplar from negative data tends to be parallel with $\Phi^+$ as shown in figure \ref{fig:C2effect}. As $C_2$ grows, this normal declines such that distance from the negative data increases.
 
-		Since FVs are $L2$ normalized our goal is to measure the similarity between two descriptors by an angle, equation \eqref{eq:class}, hence we interpret the new descriptor $\Psi_j$ as a normalized hypeplane normal such that
+		Since FVs are $L2$ normalized our goal is to measure the similarity between two descriptors by an angle, equation \eqref{eq:class}, hence we interpret the new descriptor $\Psi_j$ as a normalized hyperplane normal such that
+
 		  	\begin{equation}
 		  		\Psi_j=\dfrac{w_j}{||w_j||}
 		  	\end{equation}
 
-        Finally, this new descriptor $\Psi_j$ performs better outperforms the original FV $\Psi_j$ as shown later in section \ref{sec:exp}.
+        Notice that as $C_2$ goes to zero, the vector $\Psi_j$ becomes to be original Fisher vector $\Phi_j^+$. When $C_2$ increases the penalty term for negative data declines the vector in such way that negative training data are better separated. Loosely speaking, $C_2$ designates amount of information about discriminative and informative dimensions in the new descriptor $\Psi_j$.
 
 
 
