@@ -595,10 +595,10 @@ the direction of the optimal $w$ will be different from $w^{||}$ and will change
 	%%%%%%%%%%%%%%%%%%%%%%%%%%
    	\subsection{Experimental set-up}
    	%%%%%%%%%%%%%%%%%%%%%%%%%%
-		We performed experiments on a database of Google Street View images of Pittsburgh downloaded from the Internet. The data contains panoramas covering roughly an area of $1.3 \times 1.2 \; {\rm km}^2$. 		
+		We perform experiments on a database of Google Street View images of Pittsburgh downloaded from the Internet. The data contains panoramas covering roughly an area of $1.3 \times 1.2 \; {\rm km}^2$. 		
 		Similar to~\cite{Chen11}, for each panorama we generate 12 overlapping perspective views corresponding to two different elevation angles to capture both the street-level scene and the building fa\c{c}ades, resulting in a total of 24 perspective views each with $90^\circ$ FOV and resolution of $960 \times 720$ pixels.
-		For evaluation we have used two versions of the data. The first one was obtained from the authors of~\cite{Gronat13} ($25$k images). In the second version we download additional images to double the dataset size to $55$k images. 
-		As a query set with known ground truth GPS positions, we use the 8999 panoramas from the Google Street View research dataset. This dataset covers approximately the same area, but has been captured at a different time, and typically depicts the same places from different viewpoints and under different illumination conditions. For each test panorama, we generate a set of perspective images as described above. Finally, we randomly select out of all generated perspective views a subset of 4k images, which is used as a test set to evaluate the performance of the proposed approach.
+		For evaluation we have used two versions of this data. The first one was obtained from the authors of~\cite{Gronat13} ($25$k images). In the second version we download additional images to increase the dataset size to $55$k images. 
+		As a query set with known ground truth GPS positions, we use the 8999 panoramas from the Google Street View research dataset. This dataset covers approximately the same area, but has been captured at a different time, and depicts the same places from different viewpoints and under different illumination conditions. For each test panorama, we generate a set of perspective images as described above. Finally, we randomly select out of all generated perspective views a subset of 4k images, which is used as a test set to evaluate the performance of the proposed approach.
 %\vspace{-4mm}
 %		\paragraph{Ground truth:}
 			Since all the query images have associated GPS location we can compute their spatial distance from the database images returned by the matching method. We consider a query image to be correctly localized if the retrieved database image lies within a perimeter of $20m$ from the location of the query.
@@ -661,7 +661,6 @@ the direction of the optimal $w$ will be different from $w^{||}$ and will change
 			 consist of the original Fisher vector $\Phi_j$ of the image $j$.
 			For the SVM training we use {\tt libsvm} \cite{libsvm}. % with $L2$ regularizer. % and squared hinge loss penalty function $h(x)$ from equation \eqref{
 			 We use the same $C_1$ and $C_2$ parameters for all per-exemplar classifiers, but find the optimal value of the parameters for each dimensionality of the Fisher vector by a grid search evaluating performance on a held out set.
-			 %To obtain parameters $C_1$ and $C_2$  we perform a grid search and evaluate the performance on held out test set. 
 			 We observe that for different Fisher vector target dimensions the optimal value of parameter $C_1$ is quite stable (typically $C_1=1$) while the optimal parameter for $C_2$ varies between $10^{-6}$ to $10^{-1}$.
 			To learn the new image representation for each database image $j$ we: (i) learn SVM from $\mathcal P_j$ and $N_j$ (see above); (ii) $L2$ normalize the learned $w_j$ using equation~\eqref{eq:normalization}; and (iii) use this re-normalized vector as the new image descriptor $\Psi_j$ for image $j$. At query time we compute the Fisher vector $\Phi_q$ of the query image and measure its similarity score to the learnt descriptors $\Psi_j$ for each database image by equation~\eqref{eq:class}.
 		
@@ -683,11 +682,11 @@ the direction of the optimal $w$ will be different from $w^{||}$ and will change
 		 
 		 \paragraph{Comparison to other methods.}
 		 On the Pittsburgh 25k database, we compare performance of our learnt discriminative descriptors to the methods of~\cite{Gronat13} and~\cite{Knopp2010}, who report on the same testing data top $K=1$ recall of 36.5\% and 41.9\%, respectively (results taken from~\cite{Gronat13}). Our method outperforms~\cite{Knopp2010}
-		 already for dimension $d=128$ (37.8\%) and~\cite{Gronat13} for dimension $d=512$ (47.6\%). Furthermore, note that~\cite{Knopp2010,Gronat13} are based on a bag-of-visual-words representation, which typically needs to store between 1000-2000 non-zero visual words per image, which is significantly more than our learnt 128 or 512 dimensional descriptor. 
+		 already for dimension $d=128$ (37.8\%) and~\cite{Gronat13} for dimension $d=512$ (47.6\%). Furthermore, note that~\cite{Gronat13,Knopp2010} are based on a bag-of-visual-words representation, which typically needs to store between 1000-2000 non-zero visual words per image, which is significantly more than our learnt 128 or 512 dimensional descriptor. 
 		   
 		\paragraph{Memory complexity analysis.}
 		Figure~\ref{fig:memory} compares the performance of the learnt discriminative descriptor (FV eSVM) to the raw Fisher vectors (FV) for different target dimensions. %, clearly demonstrating the benefits of the proposed approach. 
-        The results demonstrate that our methods learns a more compact (lower-dimensional) representation for a certain level of required performance. For example, our learnt 128 dimensional descriptor achieves similar accuracy to 256 dimensional raw Fisher descriptor essentially reducing the memory complexity to 50\% for the same level of performance.  Note that 
+        The results demonstrate that for a given level of accuracy (y-axis) our method learns a more compact (lower-dimensional) representation (x-axis). For example, our learnt 128-dimensional descriptor achieves a similar accuracy (around 65\%) to the 256-dimensional raw Fisher descriptor essentially reducing the memory complexity to 50\% for the same level of performance.  Note that 
         similar to~\cite{Jegou12}, we observe decrease in performance at high-dimensions for both the baseline and our method.    		
 %		For example, to achieve accuracy of ***\% percent
 %		the proposed method reduces the memory complexity by *** MB, essentially learning a more compact image representation.  
@@ -698,8 +697,6 @@ the direction of the optimal $w$ will be different from $w^{||}$ and will change
     \caption{
         \textbf{Memory complexity analysis.} 
         The fraction of correctly localized queries at the top 10 retrieved images (y-axis) for different Fisher vector dimensions (x-axis). The learnt descriptors by our method (FV e-SVM) clearly outperform the raw Fisher vector descriptors (FV) for all dimensions. Note that for a certain level of performance (y-axis) the proposed method learns a more memory efficient (lower dimensional, x-axis) descriptor.
-%        The results demonstrate that our methods learns a more compact (lower-dimensional) representation for a certain level of required performance. For example, our learnt 128 dimensional descriptor achieves similar accuracy to 256 dimensional raw Fisher descriptor essentially reducing the memory complexity to 50\% for the same level of performance.  
-%        Similar to~\cite{Jegou12}, we observe decrease in performance at high-dimensions for both the baseline and our method.    
     }
     \label{fig:memory}
 \end{figure}
@@ -749,7 +746,8 @@ the direction of the optimal $w$ will be different from $w^{||}$ and will change
 		% \hline
 	\end{tabularx}
 	\caption{ \textcolor{myRed}{}
-		The percentage of correctly localized test queries for which the topK ranked database image is within $20$ meters from the ground truth query position. The proposed method (svmFV) outperforms the baseline methods.
+%		The percentage of correctly localized test queries for which the topK ranked database image is within $20$ meters from the ground truth query position. The proposed method (svmFV) outperforms the baseline methods.
+The fraction of correctly recognized queries (recall@K) vs. the number of top $K\in\{1,2,5,10,20\}$ retrieved database images for different Fisher vector dimensions $d\in\{128,512,2048\}$. The learnt descriptors by the proposed method (FV e-SVM) consistently improve over the raw Fisher vector descriptors across the whole range of $K$  and all dimensions on both the 25k and 55k Pittsburgh image datasets.		
 		}
     	\label{tab:recall}
     \end{centering}
@@ -762,23 +760,23 @@ the direction of the optimal $w$ will be different from $w^{||}$ and will change
         \begin{minipage}{0.34\linewidth}
             \centering
             \vspace{5mm}
-            \includegraphics[height=40mm]{imgs/ex1/query.jpg}
+            \includegraphics[height=40mm]{imgs/ex1/query}
         \end{minipage}
         % Retrieved images
         \begin{minipage}{0.75\linewidth}
             % FV e-SVM
             \begin{minipage}{\linewidth} 
-                \colorbox{myGreen}{\includegraphics[height=16mm]{imgs/ex1/FVsvm1.jpg}}
-                \colorbox{myGreen}{\includegraphics[height=16mm]{imgs/ex1/FVsvm2.jpg}}
-                \colorbox{myGreen}{\includegraphics[height=16mm]{imgs/ex1/FVsvm3.jpg}}
-                \colorbox{myGreen}{\includegraphics[height=16mm]{imgs/ex1/FVsvm4.jpg}}
+                \colorbox{myGreen}{\includegraphics[height=16mm]{imgs/ex1/FVsvm1}}
+                \colorbox{myGreen}{\includegraphics[height=16mm]{imgs/ex1/FVsvm2}}
+                \colorbox{myGreen}{\includegraphics[height=16mm]{imgs/ex1/FVsvm3}}
+                \colorbox{myGreen}{\includegraphics[height=16mm]{imgs/ex1/FVsvm4}}
             \end{minipage}
             \\
             \begin{minipage}{\linewidth}
-                \colorbox{myRed}{\includegraphics[height=16mm]{imgs/ex1/FV1.jpg}}
-                \colorbox{myRed}{\includegraphics[height=16mm]{imgs/ex1/FV2.jpg}}
-                \colorbox{myRed}{\includegraphics[height=16mm]{imgs/ex1/FV3.jpg}}
-                \colorbox{myRed}{\includegraphics[height=16mm]{imgs/ex1/FV4.jpg}}
+                \colorbox{myRed}{\includegraphics[height=16mm]{imgs/ex1/FV1}}
+                \colorbox{myRed}{\includegraphics[height=16mm]{imgs/ex1/FV2}}
+                \colorbox{myRed}{\includegraphics[height=16mm]{imgs/ex1/FV3}}
+                \colorbox{myRed}{\includegraphics[height=16mm]{imgs/ex1/FV4}}
             \end{minipage} 
         \end{minipage}
         \\
@@ -786,23 +784,23 @@ the direction of the optimal $w$ will be different from $w^{||}$ and will change
         \begin{minipage}{0.34\linewidth}
             \centering
             \vspace{0mm}
-            \includegraphics[height=36mm]{imgs/ex2/query.jpg}
+            \includegraphics[height=36mm]{imgs/ex2/query}
         \end{minipage}
         % Retrieved images
         \begin{minipage}{0.75\linewidth}
             % FV e-SVM
             \begin{minipage}{\linewidth} 
-                \colorbox{myGreen}{\includegraphics[height=16mm]{imgs/ex2/FVsvm1.jpg}}
-                \colorbox{myGreen}{\includegraphics[height=16mm]{imgs/ex2/FVsvm2.jpg}}
-                \colorbox{myGreen}{\includegraphics[height=16mm]{imgs/ex2/FVsvm3.jpg}}
-                \colorbox{myGreen}{\includegraphics[height=16mm]{imgs/ex2/FVsvm4.jpg}}
+                \colorbox{myGreen}{\includegraphics[height=16mm]{imgs/ex2/FVsvm1}}
+                \colorbox{myGreen}{\includegraphics[height=16mm]{imgs/ex2/FVsvm2}}
+                \colorbox{myGreen}{\includegraphics[height=16mm]{imgs/ex2/FVsvm3}}
+                \colorbox{myGreen}{\includegraphics[height=16mm]{imgs/ex2/FVsvm4}}
             \end{minipage}
             \\
             \begin{minipage}{\linewidth}
-                \colorbox{myRed}{\includegraphics[height=16mm]{imgs/ex2/FV1.jpg}}
-                \colorbox{myRed}{\includegraphics[height=16mm]{imgs/ex2/FV2.jpg}}
-                \colorbox{myRed}{\includegraphics[height=16mm]{imgs/ex2/FV3.jpg}}
-                \colorbox{myRed}{\includegraphics[height=16mm]{imgs/ex2/FV4.jpg}}
+                \colorbox{myRed}{\includegraphics[height=16mm]{imgs/ex2/FV1}}
+                \colorbox{myRed}{\includegraphics[height=16mm]{imgs/ex2/FV2}}
+                \colorbox{myRed}{\includegraphics[height=16mm]{imgs/ex2/FV3}}
+                \colorbox{myRed}{\includegraphics[height=16mm]{imgs/ex2/FV4}}
             \end{minipage} 
         \end{minipage}
         \vspace{3mm}
@@ -811,23 +809,23 @@ the direction of the optimal $w$ will be different from $w^{||}$ and will change
         \begin{minipage}{0.34\linewidth}
             \centering
             \vspace{0mm}
-            \includegraphics[height=36mm]{imgs/ex3/query.jpg}
+            \includegraphics[height=36mm]{imgs/ex3/query}
         \end{minipage}
         % Retrieved images
         \begin{minipage}{0.75\linewidth}
             % FV e-SVM
             \begin{minipage}{\linewidth} 
-                \colorbox{myGreen}{\includegraphics[height=16mm]{imgs/ex3/FVsvm1.jpg}}
-                \colorbox{myRed}{\includegraphics[height=16mm]{imgs/ex3/FVsvm2.jpg}}
-                \colorbox{myGreen}{\includegraphics[height=16mm]{imgs/ex3/FVsvm5.jpg}}
-                \colorbox{myGreen}{\includegraphics[height=16mm]{imgs/ex3/FVsvm4.jpg}}
+                \colorbox{myGreen}{\includegraphics[height=16mm]{imgs/ex3/FVsvm1}}
+                \colorbox{myRed}{\includegraphics[height=16mm]{imgs/ex3/FVsvm2}}
+                \colorbox{myGreen}{\includegraphics[height=16mm]{imgs/ex3/FVsvm5}}
+                \colorbox{myGreen}{\includegraphics[height=16mm]{imgs/ex3/FVsvm4}}
             \end{minipage}
             \\
             \begin{minipage}{\linewidth}
-                \colorbox{myRed}{\includegraphics[height=16mm]{imgs/ex3/FV1.jpg}}
-                \colorbox{myGreen}{\includegraphics[height=16mm]{imgs/ex3/FV2.jpg}}
-                \colorbox{myRed}{\includegraphics[height=16mm]{imgs/ex3/FV3.jpg}}
-                \colorbox{myRed}{\includegraphics[height=16mm]{imgs/ex3/FV4.jpg}}
+                \colorbox{myRed}{\includegraphics[height=16mm]{imgs/ex3/FV1}}
+                \colorbox{myGreen}{\includegraphics[height=16mm]{imgs/ex3/FV2}}
+                \colorbox{myRed}{\includegraphics[height=16mm]{imgs/ex3/FV3}}
+                \colorbox{myRed}{\includegraphics[height=16mm]{imgs/ex3/FV4}}
             \end{minipage} 
         \end{minipage}
         \vspace{3mm}
@@ -836,28 +834,28 @@ the direction of the optimal $w$ will be different from $w^{||}$ and will change
         \begin{minipage}{0.34\linewidth}
             \centering
             \vspace{0mm}
-            \includegraphics[height=36mm]{imgs/ex4/query.jpg}
+            \includegraphics[height=36mm]{imgs/ex4/query}
         \end{minipage}
         % Retrieved images
         \begin{minipage}{0.75\linewidth}
             % FV e-SVM
             \begin{minipage}{\linewidth} 
-                \colorbox{myGreen}{\includegraphics[height=16mm]{imgs/ex4/FVsvm1.jpg}}
-                \colorbox{myRed}{\includegraphics[height=16mm]{imgs/ex4/FVsvm2.jpg}}
-                \colorbox{myGreen}{\includegraphics[height=16mm]{imgs/ex4/FVsvm5.jpg}}
-                \colorbox{myGreen}{\includegraphics[height=16mm]{imgs/ex4/FVsvm4.jpg}}
+                \colorbox{myGreen}{\includegraphics[height=16mm]{imgs/ex4/FVsvm1}}
+                \colorbox{myRed}{\includegraphics[height=16mm]{imgs/ex4/FVsvm2}}
+                \colorbox{myGreen}{\includegraphics[height=16mm]{imgs/ex4/FVsvm5}}
+                \colorbox{myGreen}{\includegraphics[height=16mm]{imgs/ex4/FVsvm4}}
             \end{minipage}
             \\
             \begin{minipage}{\linewidth}
-                \colorbox{myRed}{\includegraphics[height=16mm]{imgs/ex4/FV1.jpg}}
-                \colorbox{myGreen}{\includegraphics[height=16mm]{imgs/ex4/FV2.jpg}}
-                \colorbox{myRed}{\includegraphics[height=16mm]{imgs/ex4/FV3.jpg}}
-                \colorbox{myRed}{\includegraphics[height=16mm]{imgs/ex4/FV4.jpg}}
+                \colorbox{myRed}{\includegraphics[height=16mm]{imgs/ex4/FV1}}
+                \colorbox{myGreen}{\includegraphics[height=16mm]{imgs/ex4/FV2}}
+                \colorbox{myRed}{\includegraphics[height=16mm]{imgs/ex4/FV3}}
+                \colorbox{myRed}{\includegraphics[height=16mm]{imgs/ex4/FV4}}
             \end{minipage} 
         \end{minipage}
         %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
         \caption{
-            Each example shows a query image (left) together with correct (green) and incorrect (red) matches from the database obtained by our learnt descriptors (top) and the raw Fisher vector desriptor baseline (bottom). For each method we show the top 4 matches from the database for the target dimension 128.        
+            Each example shows a query image (left) together with correct (green) and incorrect (red) matches from the database obtained by our learnt descriptors (top) and the raw Fisher vector descriptor baseline (bottom). For each method we show the top 4 matches from the database using 128-dimensional descriptors.        
         }
         \label{fig:images}
     \end{figure}
@@ -871,7 +869,7 @@ using the exemplar support vector machine applied to Fisher vector image descrip
 for expensive and tedious calibration typical for other exemplar support vector machine methods.
 Our results show significant gains in place recognition performance compared to raw Fisher vector matching
 as well as other baselines. %the bag-of-visual-words baseline. 
-This work opens-up the possibility of learning a compact and discriminative representation using other descriptors such as
+Our work opens-up the possibility of learning a compact and discriminative representation using other descriptors such as
 HOG~\cite{Dalal05} or the recently developed convolutional neural network features~\cite{Donahue13,Krizhevsky12,Oquab14,Sermanet13}
 as well as extending the analysis to other cost functions~\cite{Gharbi12,Hariharan12}. 
  
