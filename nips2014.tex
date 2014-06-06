@@ -84,7 +84,9 @@ Address \\
     \begin{center}
         \centering
         \vspace*{-10mm}
-        \fbox{\rule[-.5cm]{0cm}{4cm} \rule[-.5cm]{14cm}{0cm}}
+        \includegraphics[width=0.3\linewidth]{imgs/ex4/query}
+        \includegraphics[width=0.6\linewidth]{imgs/mapGoogleCrop}
+        %\fbox{\rule[-.5cm]{0cm}{4cm} \rule[-.5cm]{14cm}{0cm}}
         % \captionof{figure}
         % {
         %   Some caption 
@@ -723,6 +725,7 @@ the direction of the optimal $w$ will be different from $w^{||}$ and will change
 
 
     \begin{figure}
+        %%%%%%%%%%% Example 1 %%%%%%%%%%%%%%%
         % QUERY image
         \begin{minipage}{0.34\linewidth}
             \centering
@@ -747,6 +750,7 @@ the direction of the optimal $w$ will be different from $w^{||}$ and will change
             \end{minipage} 
         \end{minipage}
         \\
+        %%%%%%%%%%% Example 2 %%%%%%%%%%%%%%%
         \begin{minipage}{0.34\linewidth}
             \centering
             \vspace{0mm}
@@ -769,8 +773,59 @@ the direction of the optimal $w$ will be different from $w^{||}$ and will change
                 \colorbox{myRed}{\includegraphics[height=16mm]{imgs/ex2/FV4}}
             \end{minipage} 
         \end{minipage}
+        \vspace{3mm}
+        \\
+        %%%%%%%%%%% Example 3 %%%%%%%%%%%%%%%
+        \begin{minipage}{0.34\linewidth}
+            \centering
+            \vspace{0mm}
+            \includegraphics[height=36mm]{imgs/ex3/query}
+        \end{minipage}
+        % Retrieved images
+        \begin{minipage}{0.75\linewidth}
+            % FV e-SVM
+            \begin{minipage}{\linewidth} 
+                \colorbox{myGreen}{\includegraphics[height=16mm]{imgs/ex3/FVsvm1}}
+                \colorbox{myRed}{\includegraphics[height=16mm]{imgs/ex3/FVsvm2}}
+                \colorbox{myGreen}{\includegraphics[height=16mm]{imgs/ex3/FVsvm5}}
+                \colorbox{myGreen}{\includegraphics[height=16mm]{imgs/ex3/FVsvm4}}
+            \end{minipage}
+            \\
+            \begin{minipage}{\linewidth}
+                \colorbox{myRed}{\includegraphics[height=16mm]{imgs/ex3/FV1}}
+                \colorbox{myGreen}{\includegraphics[height=16mm]{imgs/ex3/FV2}}
+                \colorbox{myRed}{\includegraphics[height=16mm]{imgs/ex3/FV3}}
+                \colorbox{myRed}{\includegraphics[height=16mm]{imgs/ex3/FV4}}
+            \end{minipage} 
+        \end{minipage}
+        \vspace{3mm}
+        \\
+        %%%%%%%%%%% Example 4 %%%%%%%%%%%%%%%
+        \begin{minipage}{0.34\linewidth}
+            \centering
+            \vspace{0mm}
+            \includegraphics[height=36mm]{imgs/ex4/query}
+        \end{minipage}
+        % Retrieved images
+        \begin{minipage}{0.75\linewidth}
+            % FV e-SVM
+            \begin{minipage}{\linewidth} 
+                \colorbox{myGreen}{\includegraphics[height=16mm]{imgs/ex4/FVsvm1}}
+                \colorbox{myRed}{\includegraphics[height=16mm]{imgs/ex4/FVsvm2}}
+                \colorbox{myGreen}{\includegraphics[height=16mm]{imgs/ex4/FVsvm5}}
+                \colorbox{myGreen}{\includegraphics[height=16mm]{imgs/ex4/FVsvm4}}
+            \end{minipage}
+            \\
+            \begin{minipage}{\linewidth}
+                \colorbox{myRed}{\includegraphics[height=16mm]{imgs/ex4/FV1}}
+                \colorbox{myGreen}{\includegraphics[height=16mm]{imgs/ex4/FV2}}
+                \colorbox{myRed}{\includegraphics[height=16mm]{imgs/ex4/FV3}}
+                \colorbox{myRed}{\includegraphics[height=16mm]{imgs/ex4/FV4}}
+            \end{minipage} 
+        \end{minipage}
+        %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
         \caption{
-            An example of place recognition improvementd. \emph{Left} Query image, \emph{Top right} Four top-ranked database images using e-SVM FV descriptors \emph{Bottom right} Four top-ranked database images using FV descriptors. The FVs were compressed to dimension of 128 by PCA.
+            An example of place recognition improvementd. In each row: \emph{Left} Query image, \emph{Top right} Four top-ranked database images using e-SVM FV descriptors \emph{Bottom right} Four top-ranked database images using FV descriptors. The FVs were compressed to dimension of 128 by PCA.
         }
     \end{figure}
 
