@@ -58,47 +58,30 @@ Fan, R.E., Chang, K.W., Hsieh, C.J., Wang, X.R., Lin, C.J.: {LIBLINEAR}: A
   library for large linear classification.
 \newblock J. Machine Learning Research \textbf{9}, 1871--1874 (2008)
 
+\bibitem{Gharbi12}
+Gharbi, M., Malisiewicz, T., Paris, S., Durand, F.: A {G}aussian approximation
+  of feature space for fast image similarity.
+\newblock Tech. rep., MIT (2012)
+
 \bibitem{Gronat13}
 Gronat, P., Obozinski, G., Sivic, J., Pajdla, T.: Learning and calibrating
   per-location classifiers for visual place recognition.
 \newblock In: CVPR (2013)
 
-\bibitem{Gronat2013}
-Gronat, P., Obozinski, G., Sivic, J., Pajdla, T.: Learning and calibrating
-  per-location classifiers for visual place recognition.
-\newblock In: CVPR, pp. 907--914. IEEE (2013).
-\newblock
-  \urlprefix\url{http://dblp.uni-trier.de/db/conf/cvpr/cvpr2013.html#GronatOSP13}
+\bibitem{Hariharan12}
+Hariharan, B., Malik, J., Ramanan, D.: Discriminative decorrelation for
+  clustering and classification.
+\newblock In: ECCV (2012)
 
 \bibitem{Jegou2011}
 J{\'e}gou, H., Douze, M., Schmid, C.: {Product Quantization for Nearest
   Neighbor Search}.
-\newblock IEEE PAMI \textbf{33}(1), 117--128 (2011).
-\newblock \doi{10.1109/TPAMI.2010.57}.
-\newblock \urlprefix\url{http://hal.inria.fr/inria-00514462/en/}
-
-\bibitem{Jegou2010}
-J{\'e}gou, H., Douze, M., Schmid, C., P{\'e}rez, P.: {Aggregating local
-  descriptors into a compact image representation}.
-\newblock In: {CVPR 2010 - 23rd IEEE Conference on Computer Vision \& Pattern
-  Recognition}, pp. 3304--3311. IEEE Computer Society, San Francisco, United
-  States (2010).
-\newblock \doi{10.1109/CVPR.2010.5540039}.
-\newblock \urlprefix\url{http://hal.inria.fr/inria-00548637}
+\newblock IEEE PAMI \textbf{33}(1) (2011)
 
 \bibitem{Jegou12}
 J{\'e}gou, H., Perronnin, F., Douze, M., S{\'a}nchez, J., P{\'e}rez, P.,
   Schmid, C.: Aggregating local image descriptors into compact codes.
 \newblock IEEE PAMI \textbf{34}, 1704--1716 (2012)
-
-\bibitem{Jegou2012HAL}
-J{\'e}gou, H., Perronnin, F., Douze, M., S{\'a}nchez, J., P{\'e}rez, P.,
-  Schmid, C.: {Aggregating local image descriptors into compact codes}.
-\newblock IEEE Transactions on Pattern Analysis and Machine Intelligence
-  \textbf{34}(9), 1704--1716 (2012).
-\newblock \doi{10.1109/TPAMI.2011.235}.
-\newblock \urlprefix\url{http://hal.inria.fr/inria-00633013}.
-\newblock QUAERO
 
 \bibitem{Klinger13}
 Klingner, B., Martin, D., Roseborough, J.: Street view
@@ -113,10 +96,7 @@ Knopp, J., Sivic, J., Pajdla, T.: Avoidng confusing features in place
 \bibitem{Krapac2011}
 Krapac, J., Verbeek, J., Jurie, F.: {Modeling Spatial Layout with Fisher
   Vectors for Image Categorization}.
-\newblock In: {ICCV 2011 - International Conference on Computer Vision}, pp.
-  1487--1494. IEEE, Barcelona, Spain (2011).
-\newblock \doi{10.1109/ICCV.2011.6126406}.
-\newblock \urlprefix\url{http://hal.inria.fr/inria-00612277}
+\newblock In: ICCV (2011)
 
 \bibitem{Krizhevsky12}
 Krizhevsky, A., Sutskever, I., Hinton, G.E.: Imagenet classification with deep
@@ -142,17 +122,10 @@ Oquab, M., Bottou, L., Laptev, I., Sivic, J.: Learning and transferring
   mid-level image representations using convolutional neural networks.
 \newblock In: CVPR (2014)
 
-\bibitem{Perronnin2007}
-Perronnin, F., Dance, C.R.: Fisher kernels on visual vocabularies for image
-  categorization.
-\newblock In: CVPR (2007)
-
 \bibitem{Perronnin2010}
 Perronnin, F., Liu, Y., Sánchez, J., Poirier, H.: Large-scale image retrieval
   with compressed fisher vectors.
-\newblock In: CVPR, pp. 3384--3391. IEEE (2010).
-\newblock
-  \urlprefix\url{http://dblp.uni-trier.de/db/conf/cvpr/cvpr2010.html#PerronninLSP10}
+\newblock In: CVPR. IEEE (2010)
 
 \bibitem{Philbin07}
 Philbin, J., Chum, O., Isard, M., Sivic, J., Zisserman, A.: Object retrieval
@@ -163,6 +136,11 @@ Philbin, J., Chum, O., Isard, M., Sivic, J., Zisserman, A.: Object retrieval
 Sattler, T., Leibe, B., Kobbelt, L.: Improving image-based localization by
   active correspondence search.
 \newblock In: ECCV (2012)
+
+\bibitem{Sattler-BMVC12}
+Sattler, T., Weyand, T., Leibe, B., Kobbelt, L.: Image retrieval for
+  image-based localization revisited.
+\newblock In: Proc. BMVC (2012)
 
 \bibitem{Schindler07}
 Schindler, G., Brown, M., Szeliski, R.: City-scale location recognition.
@@ -192,26 +170,12 @@ Singh, S., Gupta, A., Efros, A.A.: Unsupervised discovery of mid-level
 \bibitem{Sivic03}
 Sivic, J., Zisserman, A.: {Video Google}: {A} text retrieval approach to object
   matching in videos.
-\newblock In: ICCV (2003).
-\newblock \urlprefix\url{http://www.robots.ox.ac.uk/~vgg}
-
-\bibitem{Sivic2003}
-Sivic, J., Zisserman, A.: {Video Google}: {A} text retrieval approach to object
-  matching in videos.
-\newblock In: ICCV (2003).
-\newblock \urlprefix\url{http://www.robots.ox.ac.uk/~vgg}
+\newblock In: ICCV (2003)
 
 \bibitem{Tighe13}
 Tighe, J., Lazebnik, S.: Finding things: Image parsing with regions and
   per-exemplar detectors.
 \newblock In: CVPR (2013)
-
-\bibitem{Torii2011}
-Torii, A., Sivic, J., Pajdla, T.: Visual localization by linear combination of
-  image descriptors.
-\newblock In: ICCV Workshops, pp. 102--109. IEEE (2011).
-\newblock
-  \urlprefix\url{http://dblp.uni-trier.de/db/conf/iccvw/iccvw2011.html#ToriiSP11}
 
 \bibitem{Torii2013}
 Torii, A., Sivic, J., Pajdla, T., Okutomi, M.: Visual place recognition with
